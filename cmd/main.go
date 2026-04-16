@@ -1,0 +1,1 @@
+log.Println("🚀", cfg.AppName, "running on port", cfg.AppPort)

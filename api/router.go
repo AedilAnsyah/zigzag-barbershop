@@ -1,20 +1,30 @@
 package api
+
 import (
-	"github.com/gin-gonic/gin"
 	"zigzag-barbershop/internal/auth"
+	"zigzag-barbershop/internal/booking"
+	"zigzag-barbershop/pkg/middleware"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-
+	
 	api := router.Group("/api")
 	{
+		//Public routes
 		api.POST("/auth/login", auth.LoginHandler)
 		api.POST("/auth/register", auth.RegisterHandler)
-		api.POST("/booking", func(c *gin.Context) {})
-		api.POST("/payment", func(c *gin.Context) {})
-		api.POST("/attendance", func(c *gin.Context) {})
-		api.GET("/report", func(c *gin.Context) {})
+		// protected routes
+		protected := api.Group("/")
+		protected.Use(middleware.AuthMiddleware())
+		{
+		protected.POST("/booking", booking.CreateBookingHandler)
+		protected.POST("/payment", func(c *gin.Context) {})
+		protected.POST("/attendance", func(c *gin.Context) {})
+		protected.GET("/report", func(c *gin.Context) {})
+		}
 	}
 
 	router.GET("/ping", func(c *gin.Context) {

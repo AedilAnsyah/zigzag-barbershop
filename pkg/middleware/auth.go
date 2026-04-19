@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
+	"zigzag-barbershop/internal/auth"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"fmt"
 )
 
 var SECRET_KEY = []byte("zigzag-secret")
@@ -31,12 +33,13 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenString := parts[1]
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// VALIDASI ALGORITMA
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("unexpected signing method")
-		}
-		return SECRET_KEY, nil
+		var claims auth.Claims
+
+		token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method")
+			}
+			return SECRET_KEY, nil
 		})
 
 		if err != nil || !token.Valid {
@@ -45,20 +48,9 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// ambil claims
-		claims, ok := token.Claims.(jwt.MapClaims) 
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
-			c.Abort()
-			return
-		}
-
-		userID := uint(claims["user_id"].(float64))
-
-		// simpan data user di context
-		c.Set("user_id", userID)
-		c.Set("email", claims["email"])
-		c.Set("role", claims["role"])
+		c.Set("user_id", claims.UserID)
+		c.Set("email", claims.Email)
+		c.Set("role", claims.Role)
 
 		c.Next()
 	}

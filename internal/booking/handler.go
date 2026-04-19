@@ -12,6 +12,13 @@ type CreateBookingRequest struct {
 	Time     string `json:"time" binding:"required"`
 }
 
+type BookingResponse struct {
+	UserID   uint   `json:"user_id"`
+	BarberID uint   `json:"barber_id"`
+	Date     string `json:"date"`
+	Time     string `json:"time"`
+}
+
 func CreateBookingHandler(c *gin.Context) {
 	var req CreateBookingRequest
 
@@ -20,18 +27,36 @@ func CreateBookingHandler(c *gin.Context) {
 		return
 	}
 
-	// Ambil user_id dari context (setelah middleware AuthMiddleware)
-	userID, exists := c.Get("user_id")
+	// Ambil user_id dari JWT
+	userIDValue, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error" : "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
 		return
 	}
 
-	// cast float64 ke uint
-	req.UserID = uint(userID.(float64))
+	var userID uint
+
+	switch v := userIDValue.(type) {
+	case uint:
+		userID = v
+	case float64:
+		userID = uint(v)
+	default:
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user_id type in token"})
+		return
+	}
+
+	req.UserID = userID
+
+	resp := BookingResponse{
+		UserID:   req.UserID,
+		BarberID: req.BarberID,
+		Date:     req.Date,
+		Time:     req.Time,
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "booking created successfully",
-		"data":   req,
+		"data":   resp,
 	})
 }

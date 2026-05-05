@@ -12,29 +12,34 @@ const Navbar = () => {
 
       {/* MENU */}
       <ul className="nav-links">
-  <li>
-    <NavLink to="/" end className={({ isActive }) => isActive ? "active-link" : ""}>
-      Home
-    </NavLink>
-  </li>
+        <li>
+          <NavLink to="/" end className={({ isActive }) => isActive ? "active-link" : ""}>
+            Home
+          </NavLink>
+        </li>
 
-  <li>
-    <NavLink to="/booking" className={({ isActive }) => isActive ? "active-link" : ""}>
-      Booking
-    </NavLink>
-  </li>
+        <li>
+          <NavLink to="/booking" className={({ isActive }) => isActive ? "active-link" : ""}>
+            Booking
+          </NavLink>
+        </li>
 
-  <li>
-    <NavLink to="/history" className={({ isActive }) => isActive ? "active-link" : ""}>
-      History
-    </NavLink>
-  </li>
-</ul>
+        <li>
+          <NavLink to="/history" className={({ isActive }) => isActive ? "active-link" : ""}>
+            History
+          </NavLink>
+        </li>
+      </ul>
 
       {/* BUTTON */}
       <div className="auth-buttons">
-        <button className="btn-outline">Sign in</button>
-        <button className="btn-primary">Sign up</button>
+        <NavLink to="/masuk">
+          <button className="btn-outline">Sign in</button>
+        </NavLink>
+
+        <NavLink to="/daftar">
+          <button className="btn-primary">Sign up</button>
+        </NavLink>
       </div>
     </nav>
   );

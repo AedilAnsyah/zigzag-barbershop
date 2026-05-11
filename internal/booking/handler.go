@@ -1,22 +1,19 @@
 package booking
 
 import (
+	"log"
 	"net/http"
+	"time"
+
+	"zigzag-barbershop/database"
+
 	"github.com/gin-gonic/gin"
 )
 
 type CreateBookingRequest struct {
-	UserID   uint   `json:"-"`
 	BarberID uint   `json:"barber_id" binding:"required"`
 	Date     string `json:"date" binding:"required"`
 	Time     string `json:"time" binding:"required"`
-}
-
-type BookingResponse struct {
-	UserID   uint   `json:"user_id"`
-	BarberID uint   `json:"barber_id"`
-	Date     string `json:"date"`
-	Time     string `json:"time"`
 }
 
 func CreateBookingHandler(c *gin.Context) {
@@ -24,6 +21,28 @@ func CreateBookingHandler(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// STEP 1: Validasi Booking
+	// a. Validasi format tanggal
+	bookingDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid date format, use YYYY-MM-DD"})
+		return
+	}
+
+	// b. Validasi tanggal lampau
+	today := time.Now().Truncate(24 * time.Hour)
+	if bookingDate.Before(today) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking date cannot be in the past"})
+		return
+	}
+
+	// c. Validasi format jam
+	_, err = time.Parse("15:04", req.Time)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid time format, use HH:MM"})
 		return
 	}
 
@@ -46,17 +65,30 @@ func CreateBookingHandler(c *gin.Context) {
 		return
 	}
 
-	req.UserID = userID
-
-	resp := BookingResponse{
-		UserID:   req.UserID,
+	// Buat objek booking baru
+	booking := Booking{
+		UserID:   userID,
 		BarberID: req.BarberID,
 		Date:     req.Date,
 		Time:     req.Time,
+		Status:   "pending", // Set default status ke pending
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	// Simpan ke database
+	if err := database.DB.Create(&booking).Error; err != nil {
+		// Log detailed error ke terminal
+		log.Printf("[Booking DB Error] Create failed: %v", err)
+
+		// Return detailed error ke response JSON untuk keperluan debugging
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "failed to create booking",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "booking created successfully",
-		"data":   resp,
+		"data":    booking,
 	})
 }

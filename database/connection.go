@@ -1,13 +1,11 @@
 package database
 
-import ("log"
-		"os"
-		"gorm.io/driver/postgres"
-		"gorm.io/gorm"
-		"zigzag-barbershop/internal/user"
-		"zigzag-barbershop/internal/booking"
-		"zigzag-barbershop/internal/payment"
-		"zigzag-barbershop/internal/attendance"
+import (
+	"log"
+	"os"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -21,15 +19,4 @@ func ConnectDB() {
 	}
 	DB = db
 	log.Println("Database connection established")
-	err = DB.AutoMigrate(
-		&user.User{},
-		&booking.Booking{},
-		&payment.Payment{},
-		&attendance.Attendance{},
-	)
-	if err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
-	}
-	log.Println("Database migrated successfully")
-	
 }

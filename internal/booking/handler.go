@@ -65,6 +65,14 @@ func CreateBookingHandler(c *gin.Context) {
 		return
 	}
 
+	// STEP 2: Check Booking Conflict
+	var count int64
+	database.DB.Model(&Booking{}).Where("barber_id = ? AND date = ? AND time = ? AND status IN ?", req.BarberID, req.Date, req.Time, []string{"pending", "confirmed"}).Count(&count)
+	if count > 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "booking slot already taken"})
+		return
+	}
+
 	// Buat objek booking baru
 	booking := Booking{
 		UserID:   userID,
@@ -90,5 +98,36 @@ func CreateBookingHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "booking created successfully",
 		"data":    booking,
+	})
+}
+
+func GetBookingHistoryHandler(c *gin.Context) {
+	// Ambil user_id dari JWT context
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+
+	var userID uint
+	switch v := userIDValue.(type) {
+	case uint:
+		userID = v
+	case float64:
+		userID = uint(v)
+	default:
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user_id type in token"})
+		return
+	}
+
+	// Fetch bookings dari database
+	var bookings []Booking
+	if err := database.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&bookings).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch bookings"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": bookings,
 	})
 }

@@ -131,3 +131,51 @@ func GetBookingHistoryHandler(c *gin.Context) {
 		"data": bookings,
 	})
 }
+
+func CancelBookingHandler(c *gin.Context) {
+	bookingID := c.Param("id")
+
+	// Ambil user_id dari JWT context
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+
+	var userID uint
+	switch v := userIDValue.(type) {
+	case uint:
+		userID = v
+	case float64:
+		userID = uint(v)
+	default:
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user_id type in token"})
+		return
+	}
+
+	// Cari booking berdasarkan booking id dan user_id
+	var booking Booking
+	if err := database.DB.Where("id = ? AND user_id = ?", bookingID, userID).First(&booking).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "booking not found"})
+		return
+	}
+
+	// Validasi status booking, tidak boleh dicancel jika sudah cancelled atau completed
+	if booking.Status == "cancelled" || booking.Status == "completed" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be cancelled"})
+		return
+	}
+
+	// Update status menjadi cancelled
+	booking.Status = "cancelled"
+	if err := database.DB.Save(&booking).Error; err != nil {
+		log.Printf("[Booking DB Error] Update Status Cancel failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to cancel booking"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "booking cancelled successfully",
+		"data":    booking,
+	})
+}

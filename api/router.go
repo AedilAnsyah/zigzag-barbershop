@@ -21,6 +21,7 @@ func SetupRouter() *gin.Engine {
 		protected.Use(middleware.AuthMiddleware())
 		{
 		protected.POST("/booking", booking.CreateBookingHandler)
+		protected.GET("/booking", booking.GetBookingHistoryHandler)
 		protected.POST("/payment", func(c *gin.Context) {})
 		protected.POST("/attendance", func(c *gin.Context) {})
 		protected.GET("/report", func(c *gin.Context) {})

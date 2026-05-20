@@ -69,3 +69,319 @@
   }
 }
 
+
+.booking-page {
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.booking-container {
+  padding: 120px 60px 60px;
+}
+
+.booking-header h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.booking-header p {
+  color: gray;
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+/* STEP */
+.step-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.circle {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  font-weight: bold;
+}
+
+.step.active .circle {
+  border: 2px solid #facc15;
+  color: #facc15;
+}
+
+.line {
+  width: 80px;
+  height: 2px;
+  background: #ddd;
+  margin: 0 20px;
+}
+
+/* CONTENT */
+.booking-content{
+  display: flex;
+  gap: 40px; 
+  align-items: flex-start;
+  margin-top: 35px;
+}
+
+/* GRID */
+.service-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  margin-top: 35px;
+}
+
+.service-card{
+  background: #fff;
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: 0.3s;
+  border: 2px solid transparent;
+}
+
+.service-card:hover{
+  transform: translateY(-4px);
+}
+
+.service-card.selected{
+  border: 2px solid #f5b400;
+}
+
+.service-section{
+  flex: 1;
+  margin-right: 20px;
+}
+
+.service-card.selected {
+  border: 2px solid #facc15;
+}
+
+.service-card img {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 18px;
+}
+
+.service-card h3{
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.service-card h4{
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 14px;
+}
+
+.service-card p{
+  font-size: 15px;
+  line-height: 1.7;
+  color: #9b9b9b;
+  font-weight: 400;
+  margin-bottom: 26px;
+}
+
+.service-card button{
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 10px;
+  background: #f5c400;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.service-card button:hover{
+  opacity: 0.92;
+}
+
+/* DETAIL */
+.booking-detail {
+  width: 320px;
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  margin-top: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.booking-detail h3 {
+  margin-bottom: 25px;
+}
+
+.detail-item,
+.total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.total {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+/* BUTTON */
+.booking-action {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+}
+
+.back-btn {
+  padding: 12px 25px;
+  border: 2px solid #facc15;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.next-btn {
+  padding: 12px 25px;
+  border: none;
+  background: #facc15;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.booking-title{
+  font-size: 56px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+
+.service-subtitle{
+  font-size: 17px;
+  color: #9b9b9b;
+  line-height: 1.8;
+  max-width: 850px;
+}
+
+/* =======================
+   HALAMAN LAYANAN
+======================= */
+
+.layanan-page{
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding-top: 130px;
+  padding-bottom: 100px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.layanan-container{
+  width: 88%;
+  margin: auto;
+}
+
+.layanan-title{
+  font-size: 56px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 14px;
+}
+
+.layanan-subtitle{
+  font-size: 18px;
+  color: #9d9d9d;
+  margin-bottom: 60px;
+}
+
+/* GRID */
+
+.layanan-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+/* CARD */
+
+.layanan-card{
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  min-height: 250px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.layanan-icon{
+  width: 34px;
+  height: 34px;
+  margin-bottom: 20px;
+}
+
+.layanan-card h3{
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.layanan-card h4{
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.layanan-card p{
+  font-size: 15px;
+  line-height: 1.8;
+  color: #9b9b9b;
+}
+
+/* NOTE */
+
+.layanan-note{
+  margin-top: 50px;
+  max-width: 700px;
+  color: #8f8f8f;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* BUTTON */
+
+.layanan-back{
+  margin-top: 50px;
+  width: 150px;
+  height: 52px;
+  border-radius: 10px;
+  border: 2px solid #f5c400;
+  background: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.layanan-back:hover{
+  background: #f5c400;
+}

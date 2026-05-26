@@ -23,6 +23,7 @@ func SetupRouter() *gin.Engine {
 		protected.POST("/booking", booking.CreateBookingHandler)
 		protected.GET("/booking", booking.GetBookingHistoryHandler)
 		protected.PUT("/booking/:id/cancel", booking.CancelBookingHandler)
+		protected.PUT("/booking/:id/status", booking.UpdateBookingStatusHandler)
 		protected.POST("/payment", func(c *gin.Context) {})
 		protected.POST("/attendance", func(c *gin.Context) {})
 		protected.GET("/report", func(c *gin.Context) {})

@@ -4,6 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	BookingPending   = "pending"
+	BookingConfirmed = "confirmed"
+	BookingCompleted = "completed"
+	BookingCancelled = "cancelled"
+)
+
 type Booking struct {
 	gorm.Model
 	UserID   uint   `gorm:"not null" json:"user_id"`
@@ -11,4 +18,8 @@ type Booking struct {
 	Date     string `gorm:"type:date;not null" json:"date"`
 	Time     string `gorm:"type:time;not null" json:"time"`
 	Status   string `gorm:"type:varchar(50);default:'pending';not null" json:"status"`
+}
+
+type UpdateBookingStatusRequest struct {
+	Status string `json:"status" binding:"required"`
 }

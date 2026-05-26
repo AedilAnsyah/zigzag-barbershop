@@ -67,7 +67,7 @@ func CreateBookingHandler(c *gin.Context) {
 
 	// STEP 2: Check Booking Conflict
 	var count int64
-	database.DB.Model(&Booking{}).Where("barber_id = ? AND date = ? AND time = ? AND status IN ?", req.BarberID, req.Date, req.Time, []string{"pending", "confirmed"}).Count(&count)
+	database.DB.Model(&Booking{}).Where("barber_id = ? AND date = ? AND time = ? AND status IN ?", req.BarberID, req.Date, req.Time, []string{BookingPending, BookingConfirmed}).Count(&count)
 	if count > 0 {
 		c.JSON(http.StatusConflict, gin.H{"error": "booking slot already taken"})
 		return
@@ -79,7 +79,7 @@ func CreateBookingHandler(c *gin.Context) {
 		BarberID: req.BarberID,
 		Date:     req.Date,
 		Time:     req.Time,
-		Status:   "pending", // Set default status ke pending
+		Status:   BookingPending, // Set default status ke pending
 	}
 
 	// Simpan ke database
@@ -161,13 +161,13 @@ func CancelBookingHandler(c *gin.Context) {
 	}
 
 	// Validasi status booking, tidak boleh dicancel jika sudah cancelled atau completed
-	if booking.Status == "cancelled" || booking.Status == "completed" {
+	if booking.Status == BookingCancelled || booking.Status == BookingCompleted {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be cancelled"})
 		return
 	}
 
 	// Update status menjadi cancelled
-	booking.Status = "cancelled"
+	booking.Status = BookingCancelled
 	if err := database.DB.Save(&booking).Error; err != nil {
 		log.Printf("[Booking DB Error] Update Status Cancel failed: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to cancel booking"})
@@ -176,6 +176,86 @@ func CancelBookingHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "booking cancelled successfully",
+		"data":    booking,
+	})
+}
+
+func UpdateBookingStatusHandler(c *gin.Context) {
+	// 1. Get role from JWT context
+	roleValue, exists := c.Get("role")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header is required"})
+		return
+	}
+
+	role, ok := roleValue.(string)
+	if !ok || (role != "admin" && role != "barber") {
+		c.JSON(http.StatusForbidden, gin.H{"error": "only barber or admin can update booking status"})
+		return
+	}
+
+	// 2. Get booking ID from URL param
+	bookingID := c.Param("id")
+
+	// 3. Bind JSON request body
+	var req UpdateBookingStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 4. Validate status value
+	validStatuses := map[string]bool{
+		BookingPending:   true,
+		BookingConfirmed: true,
+		BookingCompleted: true,
+		BookingCancelled: true,
+	}
+	if !validStatuses[req.Status] {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid booking status"})
+		return
+	}
+
+	// 5. Find booking by ID
+	var booking Booking
+	if err := database.DB.Where("id = ?", bookingID).First(&booking).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "booking not found"})
+		return
+	}
+
+	// 6. Reject if booking already cancelled or completed
+	if booking.Status == BookingCancelled || booking.Status == BookingCompleted {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be updated"})
+		return
+	}
+
+	// 7. Reject if status same as current
+	if booking.Status == req.Status {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking already has this status"})
+		return
+	}
+
+	// 8. Reject if transition is invalid
+	if booking.Status == BookingPending && req.Status != BookingConfirmed && req.Status != BookingCancelled {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be updated"})
+		return
+	}
+	if booking.Status == BookingConfirmed && req.Status != BookingCompleted && req.Status != BookingCancelled {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be updated"})
+		return
+	}
+
+	// 9. Update booking status
+	booking.Status = req.Status
+	if err := database.DB.Save(&booking).Error; err != nil {
+		log.Printf("[Booking DB Error] Update Status failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update booking status"})
+		return
+	}
+
+	// 10. Return success response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "booking status updated successfully",
 		"data":    booking,
 	})
 }

@@ -8,13 +8,16 @@ import (
 	"zigzag-barbershop/internal/attendance"
 	"zigzag-barbershop/internal/booking"
 	"zigzag-barbershop/internal/payment"
+	"zigzag-barbershop/internal/service"
 	"zigzag-barbershop/internal/user"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println("[INFO] File .env tidak ditemukan, menggunakan environment variable yang sudah ada")
+	}
 
 	cfg := config.LoadConfig()
 
@@ -26,6 +29,7 @@ func main() {
 		&booking.Booking{},
 		&payment.Payment{},
 		&attendance.Attendance{},
+		&service.Service{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)

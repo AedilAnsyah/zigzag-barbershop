@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"zigzag-barbershop/database"
 	"zigzag-barbershop/internal/user"
@@ -9,9 +10,10 @@ import (
 
 func Register(name, email, password, role string) error {
 	// hash password
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
-
-	// create user
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
 	u := user.User{
 		Name: name,
 		Email: email,

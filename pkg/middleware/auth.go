@@ -10,8 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var SECRET_KEY = []byte("zigzag-secret")
-
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -39,7 +37,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method")
 			}
-			return SECRET_KEY, nil
+			// Gunakan GetSecretKey() — membaca dari JWT_SECRET env var
+			return auth.GetSecretKey(), nil
 		})
 
 		if err != nil || !token.Valid {

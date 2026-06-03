@@ -6,33 +6,28 @@ import StepBooking from "../../components/StepBooking";
 const barbers = [
   {
     id: 1,
-    name: "Rizky Barber",
-    description: "Fade & Korean Style Specialist",
+    name: "Nama",
+    description: "deskripsi",
   },
-
   {
     id: 2,
-    name: "Andi Barber",
-    description: "Pompadour & Classic Cut",
+    name: "Nama",
+    description: "deskripsi",
   },
-
   {
     id: 3,
-    name: "Fajar Barber",
-    description: "Modern Style & Beard Styling",
+    name: "Nama",
+    description: "deskripsi",
   },
-
   {
     id: 4,
-    name: "Wildan Barber",
-    description: "Texture Crop & Perm Specialist",
+    name: "Nama",
+    description: "deskripsi",
   },
 ];
 
 export default function Barber() {
-
   const navigate = useNavigate();
-
   const location = useLocation();
 
   const selectedService = location.state?.service;
@@ -40,67 +35,72 @@ export default function Barber() {
   const [selectedBarber, setSelectedBarber] = useState(null);
 
   return (
-
-    <div className="min-h-screen bg-[#F5F5F5] px-10 py-10">
+    <div className="min-h-screen bg-black px-[70px] pt-[60px] pb-[80px] text-white">
 
       {/* HEADER */}
-      <div className="mb-10">
+      <div className="mb-12">
 
-        <h1 className="text-5xl font-bold text-black">
+        <h1 className="text-[52px] font-bold">
           Reservasi
         </h1>
 
-        <p className="mt-3 text-lg text-gray-500">
+        <p className="text-[20px] font-semibold text-[#8A8A8A] mt-2">
           Pesan Tempat Sekarang
         </p>
 
       </div>
 
-      {/* STEPPER */}
-      <StepBooking currentStep={2} />
+      {/* STEP BOOKING */}
+      <div className="mb-20">
+        <StepBooking currentStep={2} />
+      </div>
 
-      {/* CONTENT */}
       <div className="grid grid-cols-12 gap-10">
 
-        {/* LEFT */}
+        {/* KIRI */}
         <div className="col-span-9">
 
-          <div className="mb-10">
+          <p className="text-[#8A8A8A] text-[15px] mb-10">
+            Barber profesional kami siap memberikan hasil terbaik.
+            Pilih barber favoritmu atau biarkan kami merekomendasikan untukmu.
+          </p>
 
-            <h2 className="text-4xl font-bold text-black">
-              Pilih Barber
-            </h2>
-
-            <p className="mt-3 text-gray-400">
-              Barber profesional kami siap memberikan hasil terbaik.
-            </p>
-
-          </div>
-
-          {/* GRID */}
-          <div className="grid grid-cols-3 gap-8">
+          {/* CARD BARBER */}
+          <div className="flex flex-wrap gap-[40px] max-w-[965px]">
 
             {barbers.map((barber) => (
 
               <div
                 key={barber.id}
                 onClick={() => setSelectedBarber(barber)}
-                className={`rounded-2xl overflow-hidden border-2 cursor-pointer transition duration-300 ${
-                  selectedBarber?.id === barber.id
-                    ? "border-yellow-500 bg-yellow-50 shadow-lg"
-                    : "border-gray-200 bg-white shadow-md"
-                }`}
+                className={`
+                  w-[295px]
+                  h-[420px]
+                  rounded-[12px]
+                  overflow-hidden
+                  bg-[#242424]
+                  cursor-pointer
+                  transition-all
+                  duration-300
+                  ${
+                    selectedBarber?.id === barber.id
+                      ? "border-2 border-[#FFC400]"
+                      : "border-2 border-transparent"
+                  }
+                `}
               >
 
-                <div className="h-72 bg-gray-300"></div>
+                {/* FOTO */}
+                <div className="h-[340px] bg-[#D9D9D9]"></div>
 
-                <div className="p-5">
+                {/* INFO */}
+                <div className="h-[80px] bg-[#242424] px-5 pt-4">
 
-                  <h3 className="text-xl font-bold">
+                  <h3 className="text-[16px] font-bold text-white leading-none">
                     {barber.name}
                   </h3>
 
-                  <p className="mt-1 text-sm text-yellow-500">
+                  <p className="text-[13px] text-[#FFC400] mt-2">
                     {barber.description}
                   </p>
 
@@ -112,8 +112,8 @@ export default function Barber() {
 
           </div>
 
-          {/* ACTION */}
-          <div className="mt-14 flex justify-between">
+          {/* BUTTON */}
+          <div className="flex justify-between mt-16 max-w-[965px]">
 
             <button
               onClick={() =>
@@ -123,118 +123,105 @@ export default function Barber() {
                   },
                 })
               }
-              className="border border-yellow-400 px-6 py-3 rounded-xl bg-white hover:bg-yellow-50 transition"
+              className="
+                border
+                border-[#FFC400]
+                text-white
+                bg-black
+                px-8
+                py-3
+                rounded-[8px]
+                transition-all
+                hover:bg-[#FFC400]
+                hover:text-black
+              "
             >
               ← Kembali
             </button>
 
-            {/* NEXT */}
-{/* NEXT */}
-<button
-  disabled={!selectedBarber}
-  onClick={() =>
-    navigate("/waktu", {
-      state: {
-
-        // SERVICE
-        service: selectedService,
-
-        // BARBER
-        barber: selectedBarber,
-
-      },
-    })
-  }
-  className={`
-    rounded-xl
-    px-8
-    py-3
-    font-semibold
-    transition-all
-    duration-300
-    ${
-      selectedBarber
-        ? "bg-yellow-400 hover:bg-yellow-500 text-black"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    }
-  `}
->
-
-  Berikutnya →
-
-</button>
+            <button
+              disabled={!selectedBarber}
+              onClick={() =>
+                navigate("/waktu", {
+                  state: {
+                    service: selectedService,
+                    barber: selectedBarber,
+                  },
+                })
+              }
+              className={`
+                w-[160px]
+                h-[50px]
+                rounded-[8px]
+                font-semibold
+                transition-all
+                ${
+                  selectedBarber
+                    ? "bg-[#FFC400] text-black"
+                    : "bg-[#555555] text-[#999999]"
+                }
+              `}
+            >
+              Berikutnya →
+            </button>
 
           </div>
 
         </div>
 
-        {/* RIGHT */}
+        {/* KANAN */}
         <div className="col-span-3">
 
-          <div className="bg-white rounded-2xl shadow-md p-6">
+          <div className="bg-[#242424] rounded-[12px] p-6">
 
-            <h3 className="text-lg font-semibold text-gray-700 mb-6">
+            <h3 className="text-[#BDBDBD] text-[22px] mb-6">
               Detail Reservasi
             </h3>
 
-            <div className="space-y-4">
+            <div className="space-y-3 text-[#9A9A9A]">
 
-              <div className="flex justify-between text-gray-500">
-
+              <div className="flex justify-between">
                 <span>Layanan</span>
-
                 <span>
                   {selectedService
                     ? selectedService.name
                     : "-"}
                 </span>
-
               </div>
 
-              <div className="flex justify-between text-gray-500">
-
+              <div className="flex justify-between">
                 <span>Barber</span>
-
                 <span>
                   {selectedBarber
                     ? selectedBarber.name
                     : "-"}
                 </span>
-
               </div>
 
-              <div className="flex justify-between text-gray-500">
-
+              <div className="flex justify-between">
                 <span>Tanggal</span>
-
                 <span>-</span>
-
               </div>
 
-              <div className="flex justify-between text-gray-500">
-
+              <div className="flex justify-between">
                 <span>Waktu</span>
-
                 <span>-</span>
-
               </div>
 
             </div>
 
-            <div className="border-t my-6"></div>
+            <div className="border-t border-[#666666] my-6"></div>
 
             <div className="flex justify-between items-center">
 
-              <span className="font-semibold">
+              <span className="text-[#BDBDBD] font-semibold">
                 TOTAL
               </span>
 
-              <span className="text-2xl font-bold">
-
+              <span className="text-[#FFC400] text-[24px] font-bold">
                 {selectedService
                   ? selectedService.price
-                  : "Rp. 0"}
-
+                  : "Rp 0"}
               </span>
 
             </div>

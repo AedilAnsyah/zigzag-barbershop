@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"zigzag-barbershop/internal/auth"
+	"zigzag-barbershop/internal/barber"
 	"zigzag-barbershop/internal/booking"
 	"zigzag-barbershop/internal/service"
 	"zigzag-barbershop/pkg/middleware"
@@ -34,6 +35,7 @@ func SetupRouter() *gin.Engine {
 		api.POST("/auth/login", auth.LoginHandler)
 		api.POST("/auth/register", auth.RegisterHandler)
 		api.GET("/services", service.GetServicesHandler)
+		api.GET("/barbers", barber.GetBarbersHandler)
 
 		// Protected routes — butuh JWT token
 		protected := api.Group("/")

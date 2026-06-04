@@ -1,10 +1,14 @@
 package main
 
 import (
+	"flag"
 	"log"
+	"os"
+
 	"zigzag-barbershop/api"
 	"zigzag-barbershop/config"
 	"zigzag-barbershop/database"
+	"zigzag-barbershop/database/seed"
 	"zigzag-barbershop/internal/attendance"
 	"zigzag-barbershop/internal/booking"
 	"zigzag-barbershop/internal/payment"
@@ -15,6 +19,10 @@ import (
 )
 
 func main() {
+	// ─── Parse flags ───────────────────────────────────────────────────────────
+	shouldSeed := flag.Bool("seed", false, "Run database seeder and exit")
+	flag.Parse()
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("[INFO] File .env tidak ditemukan, menggunakan environment variable yang sudah ada")
 	}
@@ -36,6 +44,12 @@ func main() {
 	}
 	log.Println("Database migrated successfully")
 
+	// ─── Seed mode ─────────────────────────────────────────────────────────────
+	if *shouldSeed {
+		seed.Seed(database.DB)
+		os.Exit(0)
+	}
+
 	router := api.SetupRouter()
 
 	log.Printf("Starting server on port %s...", cfg.AppPort)
@@ -43,3 +57,4 @@ func main() {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
+

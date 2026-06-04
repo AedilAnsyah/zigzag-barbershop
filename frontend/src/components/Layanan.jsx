@@ -1,71 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 import haircut from "../assets/haircut.png";
 import massage from "../assets/massage.png";
 import perm from "../assets/perm.png";
 
-const services = [
-  {
-    id: 1,
-    name: "Premium Hair cut",
-    price: "Rp. 50.000,-",
-    image: haircut,
-    desc: "Termasuk Potong Rambut, Cuci Rambut, Handuk Hangat, Styling, dan Pijat Kepala Ringan.",
-  },
-
-  {
-    id: 2,
-    name: "Massage",
-    price: "Rp. 25.000,-",
-    image: massage,
-    desc: "Hilangkan penat dan stres dengan layanan massage terbaik kami.",
-  },
-
-  {
-    id: 3,
-    name: "Down Perm",
-    price: "Rp. 50.000,-",
-    image: perm,
-    desc: "Cocok untuk tampilan rambut lebih halus, rapi, dan tidak mengembang.",
-  },
-
-  {
-    id: 4,
-    name: "Curly / Cold Perm",
-    price: "Rp. 200.000,-",
-    image: perm,
-    desc: "Gaya rambut bergelombang yang stylish dan tahan lama.",
-  },
-
-  {
-    id: 5,
-    name: "Basic Colouring",
-    price: "Rp. 75.000,-",
-    image: massage,
-    desc: "Pewarnaan rambut dengan warna natural untuk tampilan yang lebih rapi.",
-  },
-
-  {
-    id: 6,
-    name: "Highlight",
-    price: "Mulai 100.000,-",
-    image: haircut,
-    desc: "Tambahan warna untuk memberi dimensi pada rambut.",
-  },
-
-  {
-    id: 7,
-    name: "Fashion Colouring",
-    price: "Mulai 250.000,-",
-    image: massage,
-    desc: "Ekspresikan gaya unikmu dengan warna rambut yang bold dan berbeda.",
-  },
-];
-
 export default function Layanan() {
-
   const navigate = useNavigate();
+
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await api.get("/services");
+        setServices(response.data.data);
+      } catch (err) {
+        setError("Gagal memuat layanan");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const getIcon = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes("massage") || lower.includes("colour")) return massage;
+    if (lower.includes("perm")) return perm;
+    return haircut;
+  };
 
   return (
     <div className="min-h-screen bg-black text-white py-20">
@@ -92,14 +59,26 @@ export default function Layanan() {
         </p>
 
         {/* GRID */}
-        <div className="
-        grid
-        md:grid-cols-3
-        gap-8
-      ">
+        <div className="grid md:grid-cols-3 gap-8">
+          {loading && (
+            <div className="col-span-3 text-center text-white font-semibold py-10">
+              Memuat layanan...
+            </div>
+          )}
 
-          {services.map((service) => (
+          {error && (
+            <div className="col-span-3 text-center text-red-500 font-semibold py-10">
+              {error}
+            </div>
+          )}
 
+          {!loading && !error && services.length === 0 && (
+            <div className="col-span-3 text-center text-white font-semibold py-10">
+              Tidak ada layanan tersedia saat ini.
+            </div>
+          )}
+
+          {!loading && !error && services.map((service) => (
             <div
               key={service.id}
               className="
@@ -112,9 +91,8 @@ export default function Layanan() {
               hover:shadow-xl
             "
             >
-
               <img
-                src={service.image}
+                src={getIcon(service.name)}
                 alt={service.name}
                 className="w-12 h-12 mb-6"
               />
@@ -134,20 +112,17 @@ export default function Layanan() {
               font-bold
               mb-4
             ">
-                {service.price}
+                Rp {service.price.toLocaleString("id-ID")},-
               </h4>
 
               <p className="
               text-[#A0A0A0]
               leading-8
             ">
-                {service.desc}
+                {service.description}
               </p>
-
             </div>
-
           ))}
-
         </div>
 
         {/* NOTE */}

@@ -1,4 +1,6 @@
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 import haircutIcon from "../assets/haircut.png";
 import massageIcon from "../assets/massage.png";
@@ -7,26 +9,30 @@ import permIcon from "../assets/perm.png";
 export default function Services() {
   const navigate = useNavigate();
 
-  const services = [
-    {
-      title: "Premium Hair cut",
-      price: "Rp. 50.000,-",
-      desc: "Termasuk Potong Rambut, Cuci Rambut, Handuk Hangat, Styling, dan Pijat Kepala Ringan.",
-      icon: haircutIcon,
-    },
-    {
-      title: "Massage",
-      price: "Rp. 25.000,-",
-      desc: "Hilangkan penat dan stres dengan layanan massage terbaik kami.",
-      icon: massageIcon,
-    },
-    {
-      title: "Down Perm",
-      price: "Rp. 50.000,-",
-      desc: "Cocok untuk tampilan rambut lebih halus, rapi, dan tidak mengembang.",
-      icon: permIcon,
-    },
-  ];
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await api.get("/services");
+        setServices(response.data.data.slice(0, 3));
+      } catch (err) {
+        setError("Gagal memuat layanan");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const getIcon = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes("massage") || lower.includes("colour")) return massageIcon;
+    if (lower.includes("perm")) return permIcon;
+    return haircutIcon;
+  };
 
   return (
     <section className="bg-black py-32">
@@ -47,33 +53,51 @@ export default function Services() {
         {/* CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
 
-          {services.map((item, index) => (
+          {loading && (
+            <div className="col-span-3 text-center text-white font-semibold">
+              Memuat layanan...
+            </div>
+          )}
+
+          {error && (
+            <div className="col-span-3 text-center text-red-500 font-semibold">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && services.length === 0 && (
+            <div className="col-span-3 text-center text-white font-semibold">
+              Tidak ada layanan tersedia saat ini.
+            </div>
+          )}
+
+          {!loading && !error && services.map((item, index) => (
             <div
-  key={index}
-  className="
-    bg-[#242424]
-    rounded-[12px]
-    p-8
-    w-[359px]
-    h-[300px]
-  "
->
+              key={item.id || index}
+              className="
+                bg-[#242424]
+                rounded-[12px]
+                p-8
+                w-[359px]
+                h-[300px]
+              "
+            >
               <img
-                src={item.icon}
-                alt={item.title}
+                src={getIcon(item.name)}
+                alt={item.name}
                 className="w-10 h-10 mb-6"
               />
 
-              <h3 className="text-white text-[24px] font-bold mb-2">
-                {item.title}
+              <h3 className="text-white text-[24px] font-bold mb-2 truncate">
+                {item.name}
               </h3>
 
               <p className="text-[#FFC400] text-[18px] font-bold mb-4">
-                {item.price}
+                Rp {item.price.toLocaleString("id-ID")},-
               </p>
 
-              <p className="text-[#A5A5A5] text-[15px] leading-7">
-                {item.desc}
+              <p className="text-[#A5A5A5] text-[15px] leading-7 line-clamp-3">
+                {item.description}
               </p>
             </div>
           ))}

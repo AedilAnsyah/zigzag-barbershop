@@ -1,34 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import heroImage from "../assets/barber.jpeg";
-
-const barbers = [
-  {
-    id: 1,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 2,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 3,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 4,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-];
+import api from "../services/api";
 
 const OurBarber = () => {
+  const [barbers, setBarbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBarbers = async () => {
+      try {
+        const response = await api.get("/barbers");
+        setBarbers(response.data.data.slice(0, 4)); // Tampilkan maksimal 4 barber di beranda
+      } catch (err) {
+        setError("Gagal memuat barber");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBarbers();
+  }, []);
   return (
     <section className="bg-black py-28">
       <div className="max-w-[1440px] mx-auto px-6">
@@ -51,7 +42,25 @@ const OurBarber = () => {
         {/* CARD GRID */}
         <div className="flex flex-wrap justify-center gap-12">
 
-          {barbers.map((barber) => (
+          {loading && (
+            <div className="w-full text-center text-white font-semibold py-10">
+              Memuat barber...
+            </div>
+          )}
+
+          {error && (
+            <div className="w-full text-center text-red-500 font-semibold py-10">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && barbers.length === 0 && (
+            <div className="w-full text-center text-white font-semibold py-10">
+              Tidak ada barber tersedia saat ini.
+            </div>
+          )}
+
+          {!loading && !error && barbers.map((barber) => (
             <div
               key={barber.id}
               className="
@@ -67,8 +76,8 @@ const OurBarber = () => {
 
               {/* FOTO */}
               <img
-                src={barber.foto}
-                alt={barber.nama}
+                src={heroImage}
+                alt={barber.name}
                 className="
                   w-full
                   h-[300px]
@@ -80,11 +89,11 @@ const OurBarber = () => {
               <div className="px-4 py-4">
 
                 <h3 className="text-white text-[18px] font-bold mb-1">
-                  {barber.nama}
+                  {barber.name}
                 </h3>
 
                 <p className="text-[#FFC400] text-[14px]">
-                  {barber.deskripsi}
+                  Barber Profesional
                 </p>
 
               </div>

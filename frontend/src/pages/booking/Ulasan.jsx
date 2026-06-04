@@ -9,6 +9,7 @@ export default function Ulasan() {
   const selectedService = location.state?.service;
   const selectedBarber = location.state?.barber;
   const selectedDate = location.state?.date;
+  const dateRaw = location.state?.dateRaw;
   const selectedTime = location.state?.time;
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -302,6 +303,7 @@ export default function Ulasan() {
                   flex-1
                   border
                   border-[#FFC400]
+                  text-[#FFC400]
                   py-3
                   rounded-lg
                   hover:bg-[#FFC400]
@@ -319,6 +321,7 @@ export default function Ulasan() {
                       service: selectedService,
                       barber: selectedBarber,
                       date: selectedDate,
+                      dateRaw: dateRaw,
                       time: selectedTime,
                     },
                   })

@@ -162,6 +162,7 @@ export default function Waktu() {
                         year: "numeric",
                       })
                       : "",
+                    dateRaw: selectedDate ? selectedDate.toISOString() : null,
                     time: selectedTime,
                   },
                 })

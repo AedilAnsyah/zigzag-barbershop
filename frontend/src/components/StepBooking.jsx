@@ -1,119 +1,91 @@
 import React from "react";
+import {
+  FiScissors,
+  FiUser,
+  FiCalendar,
+  FiCheck,
+} from "react-icons/fi";
 
 const StepBooking = ({ currentStep }) => {
+  const steps = [
+    {
+      id: 1,
+      label: "Layanan",
+      icon: <FiScissors />,
+    },
+    {
+      id: 2,
+      label: "Barber",
+      icon: <FiUser />,
+    },
+    {
+      id: 3,
+      label: "Waktu",
+      icon: <FiCalendar />,
+    },
+    {
+      id: 4,
+      label: "Ulasan",
+      icon: <FiCheck />,
+    },
+  ];
 
   return (
+    <div className="flex items-center gap-4">
 
-    <div className="flex items-center gap-6 mb-16">
+      {steps.map((step, index) => (
+        <React.Fragment key={step.id}>
 
-      {/* STEP 1 */}
-      <div className="flex flex-col items-center">
+          {/* STEP */}
+          <div className="flex flex-col items-center">
 
-        <div
-          className={`w-[62px] h-[62px] rounded-full flex items-center justify-center text-[26px] border-2 transition ${
-            currentStep === 1
-              ? "border-[#FFB800] text-[#FFB800] bg-white"
-              : "border-[#D9D9D9] text-[#A0A0A0] bg-white"
-          }`}
-        >
-          ✂
-        </div>
+            <div
+              className={`
+                w-[56px]
+                h-[56px]
+                rounded-full
+                flex
+                items-center
+                justify-center
+                text-[22px]
+                border
+                transition-all
+                duration-300
 
-        <span
-          className={`mt-3 text-[15px] ${
-            currentStep === 1
-              ? "text-black font-semibold"
-              : "text-[#A0A0A0]"
-          }`}
-        >
-          Layanan
-        </span>
+                ${
+                  currentStep === step.id
+                    ? "bg-white border-[#F7C600] text-[#F7C600]"
+                    : "bg-white border-[#D9D9D9] text-[#A0A0A0]"
+                }
+              `}
+            >
+              {step.icon}
+            </div>
 
-      </div>
+            <span
+              className={`
+                mt-3
+                text-[15px]
 
-      {/* LINE */}
-      <div className="w-[70px] h-[2px] bg-[#CFCFCF] mb-6"></div>
+                ${
+                  currentStep === step.id
+                    ? "text-[#F7C600] font-medium"
+                    : "text-[#9E9E9E]"
+                }
+              `}
+            >
+              {step.label}
+            </span>
 
-      {/* STEP 2 */}
-      <div className="flex flex-col items-center">
+          </div>
 
-        <div
-          className={`w-[62px] h-[62px] rounded-full flex items-center justify-center text-[24px] border-2 transition ${
-            currentStep === 2
-              ? "border-[#FFB800] text-[#FFB800] bg-white"
-              : "border-[#D9D9D9] text-[#A0A0A0] bg-white"
-          }`}
-        >
-          👤
-        </div>
+          {/* GARIS */}
+          {index !== steps.length - 1 && (
+            <div className="w-[48px] h-[1px] bg-[#8F8F8F] mb-7"></div>
+          )}
 
-        <span
-          className={`mt-3 text-[15px] ${
-            currentStep === 2
-              ? "text-black font-semibold"
-              : "text-[#A0A0A0]"
-          }`}
-        >
-          Barber
-        </span>
-
-      </div>
-
-      {/* LINE */}
-      <div className="w-[70px] h-[2px] bg-[#CFCFCF] mb-6"></div>
-
-      {/* STEP 3 */}
-      <div className="flex flex-col items-center">
-
-        <div
-          className={`w-[62px] h-[62px] rounded-full flex items-center justify-center text-[24px] border-2 transition ${
-            currentStep === 3
-              ? "border-[#FFB800] text-[#FFB800] bg-white"
-              : "border-[#D9D9D9] text-[#A0A0A0] bg-white"
-          }`}
-        >
-          📅
-        </div>
-
-        <span
-          className={`mt-3 text-[15px] ${
-            currentStep === 3
-              ? "text-black font-semibold"
-              : "text-[#A0A0A0]"
-          }`}
-        >
-          Waktu
-        </span>
-
-      </div>
-
-      {/* LINE */}
-      <div className="w-[70px] h-[2px] bg-[#CFCFCF] mb-6"></div>
-
-      {/* STEP 4 */}
-      <div className="flex flex-col items-center">
-
-        <div
-          className={`w-[62px] h-[62px] rounded-full flex items-center justify-center text-[24px] border-2 transition ${
-            currentStep === 4
-              ? "border-[#FFB800] text-[#FFB800] bg-white"
-              : "border-[#D9D9D9] text-[#A0A0A0] bg-white"
-          }`}
-        >
-          ✔
-        </div>
-
-        <span
-          className={`mt-3 text-[15px] ${
-            currentStep === 4
-              ? "text-black font-semibold"
-              : "text-[#A0A0A0]"
-          }`}
-        >
-          Ulasan
-        </span>
-
-      </div>
+        </React.Fragment>
+      ))}
 
     </div>
   );

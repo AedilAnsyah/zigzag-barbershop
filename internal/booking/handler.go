@@ -6,14 +6,17 @@ import (
 	"time"
 
 	"zigzag-barbershop/database"
+	"zigzag-barbershop/internal/service"
+	"zigzag-barbershop/internal/user"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CreateBookingRequest struct {
-	BarberID uint   `json:"barber_id" binding:"required"`
-	Date     string `json:"date" binding:"required"`
-	Time     string `json:"time" binding:"required"`
+	ServiceID uint   `json:"service_id" binding:"required"`
+	BarberID  uint   `json:"barber_id" binding:"required"`
+	Date      string `json:"date" binding:"required"`
+	Time      string `json:"time" binding:"required"`
 }
 
 func CreateBookingHandler(c *gin.Context) {
@@ -65,7 +68,21 @@ func CreateBookingHandler(c *gin.Context) {
 		return
 	}
 
-	// STEP 2: Check Booking Conflict
+	// STEP 2: Validasi service exists dan is_available
+	var svc service.Service
+	if err := database.DB.Where("id = ? AND is_available = ?", req.ServiceID, true).First(&svc).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "service not found or not available"})
+		return
+	}
+
+	// STEP 3: Validasi barber exists dengan role='barber'
+	var barberUser user.User
+	if err := database.DB.Where("id = ? AND role = ?", req.BarberID, "barber").First(&barberUser).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "barber not found"})
+		return
+	}
+
+	// STEP 4: Check Booking Conflict
 	var count int64
 	database.DB.Model(&Booking{}).Where("barber_id = ? AND date = ? AND time = ? AND status IN ?", req.BarberID, req.Date, req.Time, []string{BookingPending, BookingConfirmed}).Count(&count)
 	if count > 0 {
@@ -74,12 +91,14 @@ func CreateBookingHandler(c *gin.Context) {
 	}
 
 	// Buat objek booking baru
+	serviceID := req.ServiceID
 	booking := Booking{
-		UserID:   userID,
-		BarberID: req.BarberID,
-		Date:     req.Date,
-		Time:     req.Time,
-		Status:   BookingPending, // Set default status ke pending
+		UserID:    userID,
+		BarberID:  req.BarberID,
+		ServiceID: &serviceID,
+		Date:      req.Date,
+		Time:      req.Time,
+		Status:    BookingPending, // Set default status ke pending
 	}
 
 	// Simpan ke database

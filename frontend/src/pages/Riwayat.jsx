@@ -1,56 +1,88 @@
-import React from "react";
-import {
-  FiCalendar,
-  FiClock,
-} from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { FiCalendar, FiClock } from "react-icons/fi";
+import api from "../services/api";
 
 export default function Riwayat() {
+  const [riwayat, setRiwayat] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const dataRiwayat = [
-    {
-      id: 1,
-      layanan: "Premium Hair Cut",
-      tanggal: "Senin, 1 Juni 2026",
-      jam: "12.00",
-      barber: "dengan",
-      harga: "Rp 50.000",
-      status: "Dikonfirmasi",
-    },
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch bookings, services, and barbers in parallel
+        const [bookingsRes, servicesRes, barbersRes] = await Promise.all([
+          api.get("/booking"),
+          api.get("/services"),
+          api.get("/barbers"),
+        ]);
 
-    {
-      id: 2,
-      layanan: "Premium Hair Cut",
-      tanggal: "Kamis, 8 April 2026",
-      jam: "15.00",
-      barber: "dengan",
-      harga: "Rp 50.000",
-      status: "Dibatalkan",
-    },
+        const bookingsData = bookingsRes.data.data || [];
+        const servicesData = servicesRes.data.data || [];
+        const barbersData = barbersRes.data.data || [];
 
-    {
-      id: 3,
-      layanan: "Premium Hair Cut",
-      tanggal: "Jum'at, 16 Januari 2026",
-      jam: "17.00",
-      barber: "dengan",
-      harga: "Rp 50.000",
-      status: "Selesai",
-    },
-  ];
+        // Map data
+        const formatted = bookingsData.map((b) => {
+          const service = servicesData.find((s) => s.id === b.service_id);
+          const barber = barbersData.find((br) => br.id === b.barber_id);
+          
+          let formattedDate = b.date;
+          try {
+            const d = new Date(b.date);
+            formattedDate = d.toLocaleDateString("id-ID", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+          } catch (e) {}
+
+          let formattedTime = b.time;
+          if (b.time) {
+            formattedTime = b.time.substring(0, 5).replace(":", ".");
+          }
+
+          let displayStatus = b.status;
+          if (b.status === "pending") displayStatus = "Menunggu";
+          if (b.status === "confirmed") displayStatus = "Dikonfirmasi";
+          if (b.status === "cancelled") displayStatus = "Dibatalkan";
+          if (b.status === "completed") displayStatus = "Selesai";
+
+          return {
+            id: b.ID,
+            layanan: service ? service.name : `Layanan ${b.service_id}`,
+            tanggal: formattedDate,
+            jam: formattedTime,
+            barber: `dengan ${barber ? barber.name : `Barber ${b.barber_id}`}`,
+            harga: service ? `Rp ${service.price.toLocaleString("id-ID")}` : "-",
+            status: displayStatus,
+          };
+        });
+
+        setRiwayat(formatted);
+      } catch (err) {
+        setError("Gagal memuat riwayat booking.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
 
   const getStatusStyle = (status) => {
-
     switch (status) {
-
       case "Dikonfirmasi":
         return "bg-blue-100 text-blue-600";
-
       case "Dibatalkan":
         return "bg-red-100 text-red-500";
-
       case "Selesai":
         return "bg-green-100 text-green-600";
-
+      case "Menunggu":
+        return "bg-yellow-100 text-yellow-600";
       default:
         return "bg-gray-100 text-gray-600";
     }
@@ -70,8 +102,13 @@ export default function Riwayat() {
 
       {/* LIST */}
       <div className="space-y-4">
+        {loading && <p className="text-white">Memuat riwayat...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!loading && !error && riwayat.length === 0 && (
+          <p className="text-[#9E9E9E]">Belum ada riwayat reservasi.</p>
+        )}
 
-        {dataRiwayat.map((item) => (
+        {riwayat.map((item) => (
 
           <div
             key={item.id}

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import qrisImage from "../../assets/QRIS.png";
 
 export default function Payment() {
@@ -8,7 +10,65 @@ export default function Payment() {
   const selectedService = location.state?.service;
   const selectedBarber = location.state?.barber;
   const selectedDate = location.state?.date;
+  const dateRaw = location.state?.dateRaw;
   const selectedTime = location.state?.time;
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleBooking = async () => {
+    if (!selectedService || !selectedBarber || !dateRaw || !selectedTime) {
+      setError("Data reservasi tidak lengkap");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Format YYYY-MM-DD
+      const d = new Date(dateRaw);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+      // Format HH:MM
+      const formattedTime = selectedTime.replace(".", ":");
+
+      const payload = {
+        service_id: selectedService.id,
+        barber_id: selectedBarber.id,
+        date: formattedDate,
+        time: formattedTime,
+      };
+
+      await api.post("/booking", payload);
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.error || "Gagal membuat reservasi. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+        <h1 className="text-[48px] font-bold text-[#FFC400] mb-4">Booking Berhasil!</h1>
+        <p className="text-[#9E9E9E] mb-8 text-center max-w-md leading-relaxed">
+          Reservasi Anda telah berhasil dibuat. Kami menunggu kedatangan Anda di Zigzag Barbershop sesuai dengan jadwal yang telah ditentukan.
+        </p>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-[#FFC400] text-black font-semibold px-8 py-3 rounded-[8px] hover:brightness-95 transition"
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white px-[55px] py-[40px]">
@@ -116,7 +176,7 @@ export default function Payment() {
                 </p>
 
                 <p className="text-[#FFC400] font-medium">
-                  {selectedService?.price || "Rp 0"}
+                  {selectedService ? `Rp ${selectedService.price.toLocaleString("id-ID")},-` : "Rp 0"}
                 </p>
 
               </div>
@@ -133,7 +193,7 @@ export default function Payment() {
               </h2>
 
               <h2 className="text-[42px] font-bold text-[#FFC400]">
-                {selectedService?.price || "Rp 0"}
+                {selectedService ? `Rp ${selectedService.price.toLocaleString("id-ID")},-` : "Rp 0"}
               </h2>
 
             </div>
@@ -141,9 +201,15 @@ export default function Payment() {
           </div>
 
           {/* BUTTON */}
-          <div className="flex justify-end mt-12">
+          <div className="flex flex-col items-end mt-12 gap-3">
+
+            {error && (
+              <p className="text-red-500 font-semibold">{error}</p>
+            )}
 
             <button
+              onClick={handleBooking}
+              disabled={loading}
               className="
                 bg-[#FFC400]
                 text-black
@@ -153,9 +219,11 @@ export default function Payment() {
                 rounded-[10px]
                 hover:brightness-95
                 transition
+                disabled:opacity-50
+                disabled:cursor-not-allowed
               "
             >
-              Konfirmasi
+              {loading ? "Memproses..." : "Konfirmasi"}
             </button>
 
           </div>

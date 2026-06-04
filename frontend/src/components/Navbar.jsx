@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import logo from "../assets/logo.png";
 import { NavLink } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
+  const { user, logout } = useContext(AuthContext);
 
   return (
 
@@ -72,59 +74,63 @@ const Navbar = () => {
 
       {/* AUTH BUTTON */}
       <div className="flex items-center gap-4">
-
-        {/* MASUK */}
-        <NavLink to="/masuk">
-
-          {({ isActive }) => (
-
+        {user ? (
+          <>
+            <span className="text-white font-medium mr-2">Halo, {user.email.split('@')[0]}</span>
             <button
-              className={`
-                px-7 py-3
-                rounded-xl
-                border-2 border-[#FFB800]
-                font-semibold
-                transition-all duration-300
-                ${
-                  isActive
-                    ? "bg-[#FFB800] text-black"
-                    : "bg-black text-white hover:bg-[#FFB800] hover:text-black"
-                }
-              `}
+              onClick={logout}
+              className="px-7 py-3 rounded-xl border-2 border-red-500 font-semibold transition-all duration-300 bg-black text-white hover:bg-red-500"
             >
-              Masuk
+              Keluar
             </button>
+          </>
+        ) : (
+          <>
+            {/* MASUK */}
+            <NavLink to="/masuk">
+              {({ isActive }) => (
+                <button
+                  className={`
+                    px-7 py-3
+                    rounded-xl
+                    border-2 border-[#FFB800]
+                    font-semibold
+                    transition-all duration-300
+                    ${
+                      isActive
+                        ? "bg-[#FFB800] text-black"
+                        : "bg-black text-white hover:bg-[#FFB800] hover:text-black"
+                    }
+                  `}
+                >
+                  Masuk
+                </button>
+              )}
+            </NavLink>
 
-          )}
-
-        </NavLink>
-
-        {/* DAFTAR */}
-        <NavLink to="/daftar">
-
-          {({ isActive }) => (
-
-            <button
-              className={`
-                px-7 py-3
-                rounded-xl
-                border-2 border-[#FFB800]
-                font-semibold
-                transition-all duration-300
-                ${
-                  isActive
-                    ? "bg-[#FFB800] text-black"
-                    : "bg-black text-white hover:bg-[#FFB800] hover:text-black"
-                }
-              `}
-            >
-              Daftar
-            </button>
-
-          )}
-
-        </NavLink>
-
+            {/* DAFTAR */}
+            <NavLink to="/daftar">
+              {({ isActive }) => (
+                <button
+                  className={`
+                    px-7 py-3
+                    rounded-xl
+                    border-2 border-[#FFB800]
+                    font-semibold
+                    transition-all duration-300
+                    ${
+                      isActive
+                        ? "bg-[#FFB800] text-black"
+                        : "bg-black text-white hover:bg-[#FFB800] hover:text-black"
+                    }
+                  `}
+                >
+                  Daftar
+                </button>
+              )}
+            </NavLink>
+          </>
+        )}
       </div>
 
     </nav>

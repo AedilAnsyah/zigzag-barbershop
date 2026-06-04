@@ -86,48 +86,6 @@ func seedServices(db *gorm.DB) {
 			DurationMinutes: 45,
 			IsAvailable:     true,
 		},
-		{
-			Name:            "Massage",
-			Description:     "Hilangkan penat dan stres dengan layanan massage terbaik kami.",
-			Price:           25000,
-			DurationMinutes: 30,
-			IsAvailable:     true,
-		},
-		{
-			Name:            "Down Perm",
-			Description:     "Cocok untuk tampilan rambut lebih halus, rapi, dan tidak mengembang.",
-			Price:           50000,
-			DurationMinutes: 60,
-			IsAvailable:     true,
-		},
-		{
-			Name:            "Curly / Cold Perm",
-			Description:     "Gaya rambut bergelombang yang stylish dan tahan lama.",
-			Price:           200000,
-			DurationMinutes: 90,
-			IsAvailable:     true,
-		},
-		{
-			Name:            "Basic Colouring",
-			Description:     "Pewarnaan rambut dengan warna natural untuk tampilan yang lebih rapi.",
-			Price:           75000,
-			DurationMinutes: 60,
-			IsAvailable:     true,
-		},
-		{
-			Name:            "Highlight",
-			Description:     "Tambahan warna untuk memberi dimensi pada rambut.",
-			Price:           100000,
-			DurationMinutes: 90,
-			IsAvailable:     true,
-		},
-		{
-			Name:            "Fashion Colouring",
-			Description:     "Ekspresikan gaya unikmu dengan warna rambut yang bold dan berbeda.",
-			Price:           250000,
-			DurationMinutes: 120,
-			IsAvailable:     true,
-		},
 	}
 
 	for _, svc := range services {

@@ -5,6 +5,10 @@ import {
   Route,
 } from "react-router-dom";
 
+// CONTEXT
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+
 // COMPONENTS
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -31,9 +35,10 @@ import "./App.css";
 
 function App() {
   return (
-    <Router>
+    <AuthProvider>
+      <Router>
 
-      <Navbar />
+        <Navbar />
 
       <div style={{ paddingTop: "80px" }}>
 
@@ -50,39 +55,41 @@ function App() {
             }
           />
 
-          <Route
-            path="/booking"
-            element={<Booking />}
-          />
+          <Route element={<PrivateRoute />}>
+            <Route
+              path="/booking"
+              element={<Booking />}
+            />
+
+            <Route
+              path="/barber"
+              element={<Barber />}
+            />
+
+            <Route
+              path="/waktu"
+              element={<Waktu />}
+            />
+
+            <Route
+              path="/review"
+              element={<Ulasan />}
+            />
+
+            <Route
+              path="/payment"
+              element={<Payment />}
+            />
+
+            <Route
+              path="/history"
+              element={<History />}
+            />
+          </Route>
 
           <Route
             path="/layanan"
             element={<BookingLayanan />}
-          />
-
-          <Route
-            path="/barber"
-            element={<Barber />}
-          />
-
-          <Route
-            path="/waktu"
-            element={<Waktu />}
-          />
-
-          <Route
-            path="/review"
-            element={<Ulasan />}
-          />
-
-          <Route
-            path="/payment"
-            element={<Payment />}
-          />
-
-          <Route
-            path="/history"
-            element={<History />}
           />
 
           <Route
@@ -95,18 +102,14 @@ function App() {
             element={<SignUp />}
           />
 
-          <Route
-            path="/history"
-            element={<Riwayat />}
-          />
-
         </Routes>
 
       </div>
 
-      <Footer />
+        <Footer />
 
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

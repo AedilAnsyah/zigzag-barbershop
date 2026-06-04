@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { AuthContext } from "../context/AuthContext";
 import google from "../assets/google.png";
 
 export default function SignIn() {
 
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
 
@@ -21,16 +26,19 @@ export default function SignIn() {
 
   };
 
-  const handleSubmit = (e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
 
-    console.log("LOGIN :", formData);
+    const result = await login(formData.email, formData.password);
 
-    alert("Berhasil Masuk!");
-
-    navigate("/");
-
+    if (result.success) {
+      navigate("/");
+    } else {
+      setErrorMsg(result.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,6 +91,13 @@ export default function SignIn() {
 
           </div>
 
+          {/* ERROR MESSAGE */}
+          {errorMsg && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-xl mb-5 text-sm">
+              {errorMsg}
+            </div>
+          )}
+
           {/* FORM */}
           <form onSubmit={handleSubmit}>
 
@@ -127,9 +142,12 @@ export default function SignIn() {
             {/* BUTTON */}
             <button
               type="submit"
-              className="w-full bg-[#FFCC00] hover:bg-yellow-400 transition rounded-xl py-4 font-bold text-black"
+              disabled={loading}
+              className={`w-full transition rounded-xl py-4 font-bold text-black ${
+                loading ? "bg-yellow-600 cursor-not-allowed" : "bg-[#FFCC00] hover:bg-yellow-400"
+              }`}
             >
-              Masuk
+              {loading ? "Memproses..." : "Masuk"}
             </button>
 
           </form>

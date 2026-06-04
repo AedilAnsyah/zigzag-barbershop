@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import api from "../services/api";
 import google from "../assets/google.png";
 
 export default function SignUp() {
@@ -13,6 +14,9 @@ export default function SignUp() {
     password: "",
   });
 
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
 
     setFormData({
@@ -22,16 +26,37 @@ export default function SignUp() {
 
   };
 
-  const handleSubmit = (e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
 
-    console.log("REGISTER :", formData);
+    if (formData.password.length < 6) {
+      setErrorMsg("Password minimal 6 karakter");
+      return;
+    }
 
-    alert("Akun berhasil dibuat!");
+    setLoading(true);
 
-    navigate("/masuk");
+    try {
+      await api.post("/auth/register", {
+        name: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+        role: "customer"
+      });
 
+      navigate("/masuk");
+    } catch (error) {
+      let errorMessage = error.response?.data?.error || "Gagal mendaftar. Silakan coba lagi.";
+      
+      if (errorMessage.includes("duplicate key value") && errorMessage.includes("email")) {
+        errorMessage = "Email ini sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.";
+      }
+      
+      setErrorMsg(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,6 +108,13 @@ export default function SignUp() {
             <div className="flex-1 h-[1px] bg-gray-500"></div>
 
           </div>
+
+          {/* ERROR MESSAGE */}
+          {errorMsg && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-xl mb-5 text-sm">
+              {errorMsg}
+            </div>
+          )}
 
           {/* FORM */}
           <form onSubmit={handleSubmit}>
@@ -147,9 +179,12 @@ export default function SignUp() {
             {/* BUTTON */}
             <button
               type="submit"
-              className="w-full bg-[#FFCC00] hover:bg-yellow-400 transition rounded-xl py-4 font-bold text-black"
+              disabled={loading}
+              className={`w-full transition rounded-xl py-4 font-bold text-black ${
+                loading ? "bg-yellow-600 cursor-not-allowed" : "bg-[#FFCC00] hover:bg-yellow-400"
+              }`}
             >
-              Buat akun
+              {loading ? "Memproses..." : "Buat akun"}
             </button>
 
           </form>

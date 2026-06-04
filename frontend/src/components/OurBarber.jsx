@@ -2,56 +2,96 @@ import React from "react";
 import heroImage from "../assets/barber.jpeg";
 
 const barbers = [
-  { id: 1, nama: "Nama", deskripsi: "deskripsi" },
-  { id: 2, nama: "Nama", deskripsi: "deskripsi" },
-  { id: 3, nama: "Nama", deskripsi: "deskripsi" },
-  { id: 4, nama: "Nama", deskripsi: "deskripsi" },
+  {
+    id: 1,
+    nama: "Nama",
+    deskripsi: "deskripsi",
+    foto: heroImage,
+  },
+  {
+    id: 2,
+    nama: "Nama",
+    deskripsi: "deskripsi",
+    foto: heroImage,
+  },
+  {
+    id: 3,
+    nama: "Nama",
+    deskripsi: "deskripsi",
+    foto: heroImage,
+  },
+  {
+    id: 4,
+    nama: "Nama",
+    deskripsi: "deskripsi",
+    foto: heroImage,
+  },
 ];
 
-const Barbers = () => {
+const OurBarber = () => {
   return (
-    <section className="bg-[#f5f5f5] py-16 font-poppins">
-      <div className="max-w-6xl mx-auto px-4 text-center">
+    <section className="bg-black py-28">
+      <div className="max-w-[1440px] mx-auto px-6">
 
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
-          Barber Kami
-        </h2>
+        {/* TITLE */}
+        <div className="text-center mb-24">
+          <h2 className="text-white text-[56px] font-bold mb-8">
+            Barber Kami
+          </h2>
 
-        {/* Subtitle */}
-        <p className="text-gray-500 text-sm max-w-3xl mx-auto mb-12">
-          Di Zigzag Barbershop, setiap barber kami bekerja dengan standar yang sama:
-          rapi, detail, dan profesional. Kamu tidak perlu bingung memilih siapapun
-          yang melayani, hasilnya tetap maksimal.
-        </p>
+          <p className="text-[#8F8F8F] text-[18px] leading-9 max-w-[1000px] mx-auto">
+            Di Zigzag Barbershop, setiap barber kami bekerja dengan standar yang sama:
+            rapi, detail, dan profesional.
+            <br />
+            Kamu tidak perlu bingung memilih siapapun yang melayani,
+            hasilnya tetap maksimal.
+          </p>
+        </div>
 
-        {/* Card Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {/* CARD GRID */}
+        <div className="flex flex-wrap justify-center gap-12">
+
           {barbers.map((barber) => (
             <div
               key={barber.id}
-              className="bg-white rounded-xl shadow-md p-4 text-left hover:shadow-lg transition"
+              className="
+                w-[280px]
+                rounded-xl
+                overflow-hidden
+                bg-[#242424]
+                transition-all
+                duration-300
+                hover:-translate-y-2
+              "
             >
 
-              {/* Image Placeholder */}
+              {/* FOTO */}
               <img
-                src={heroImage}
+                src={barber.foto}
                 alt={barber.nama}
-                className="w-full h-70 object-cover rounded-lg mb-3"
+                className="
+                  w-full
+                  h-[300px]
+                  object-cover
+                "
               />
 
-              {/* Name */}
-              <h3 className="font-bold text-gray-900">
-                {barber.nama}
-              </h3>
+              {/* INFO */}
+              <div className="px-4 py-4">
 
-              {/* Description */}
-              <p className="text-sm text-gray-500">
-                {barber.deskripsi}
-              </p>
+                <h3 className="text-white text-[18px] font-bold mb-1">
+                  {barber.nama}
+                </h3>
+
+                <p className="text-[#FFC400] text-[14px]">
+                  {barber.deskripsi}
+                </p>
+
+              </div>
 
             </div>
           ))}
+
         </div>
 
       </div>
@@ -59,4 +99,4 @@ const Barbers = () => {
   );
 };
 
-export default Barbers;
+export default OurBarber;

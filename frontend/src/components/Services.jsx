@@ -1,44 +1,25 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import haircutIcon from "../assets/haircut.png";
 import massageIcon from "../assets/massage.png";
 import permIcon from "../assets/perm.png";
 
-export default function ServiceSection() {
-
+export default function Services() {
   const navigate = useNavigate();
 
-  // IMPORT FONT POPPINS
-  useEffect(() => {
-
-    const link = document.createElement("link");
-
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap";
-
-    link.rel = "stylesheet";
-
-    document.head.appendChild(link);
-
-  }, []);
-
-  // DATA SERVICES
   const services = [
     {
-      title: "Hair cut",
+      title: "Premium Hair cut",
       price: "Rp. 50.000,-",
-      desc: "Include Haircut, Hairwash, Hot Towel, Styling, Simple Head Massage.",
+      desc: "Termasuk Potong Rambut, Cuci Rambut, Handuk Hangat, Styling, dan Pijat Kepala Ringan.",
       icon: haircutIcon,
     },
-
     {
       title: "Massage",
       price: "Rp. 25.000,-",
       desc: "Hilangkan penat dan stres dengan layanan massage terbaik kami.",
       icon: massageIcon,
     },
-
     {
       title: "Down Perm",
       price: "Rp. 50.000,-",
@@ -48,73 +29,79 @@ export default function ServiceSection() {
   ];
 
   return (
-
-    <section className="bg-[#F5F5F5] py-24 font-[Poppins]">
-
-      <div className="max-w-6xl mx-auto px-4 text-center">
+    <section className="bg-black py-32">
+      <div className="max-w-[1200px] mx-auto px-6">
 
         {/* TITLE */}
-        <h2 className="text-[42px] font-bold text-black mb-4">
-          Layanan Kami
-        </h2>
+        <div className="text-center">
+          <h2 className="text-white text-[56px] font-bold">
+            Layanan Kami
+          </h2>
 
-        {/* SUBTITLE */}
-        <p className="text-[#A0A0A0] text-[15px] leading-7 max-w-3xl mx-auto mb-16">
-          Tidak perlu antre! Gunakan sistem booking kami untuk memilih waktu yang kamu inginkan dan nikmati layanan tanpa ribet.
-        </p>
+          <p className="text-[#BDBDBD] text-[16px] mt-6 max-w-[700px] mx-auto">
+            Tidak perlu antre! Gunakan sistem booking kami untuk memilih waktu
+            yang kamu inginkan dan nikmati layanan tanpa ribet.
+          </p>
+        </div>
 
-        {/* CARD GRID */}
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
 
-          {services.map((item, i) => (
-
+          {services.map((item, index) => (
             <div
-              key={i}
-              className="bg-white rounded-[24px] shadow-md p-8 text-left hover:shadow-xl transition duration-300"
-            >
-
-              {/* ICON */}
+  key={index}
+  className="
+    bg-[#242424]
+    rounded-[12px]
+    p-8
+    w-[359px]
+    h-[300px]
+  "
+>
               <img
                 src={item.icon}
                 alt={item.title}
-                className="w-11 h-11 mb-5"
+                className="w-10 h-10 mb-6"
               />
 
-              {/* TITLE */}
-              <h3 className="text-[30px] font-bold text-black leading-tight mb-2">
+              <h3 className="text-white text-[24px] font-bold mb-2">
                 {item.title}
               </h3>
 
-              {/* PRICE */}
-              <p className="text-[18px] font-bold text-black mb-4">
+              <p className="text-[#FFC400] text-[18px] font-bold mb-4">
                 {item.price}
               </p>
 
-              {/* DESCRIPTION */}
-              <p className="text-[#9A9A9A] text-[15px] leading-7">
+              <p className="text-[#A5A5A5] text-[15px] leading-7">
                 {item.desc}
               </p>
-
             </div>
-
           ))}
-
         </div>
 
-        {/* BOTTOM BUTTON */}
-        <div className="mt-16">
-
+        {/* BUTTON */}
+        <div className="flex justify-center mt-20">
           <button
             onClick={() => navigate("/layanan")}
-            className="border-2 border-[#FFB22C] px-8 py-3 rounded-xl font-semibold text-black hover:bg-[#FFB22C] transition"
+            className="
+              w-[300px]
+              h-[58px]
+              border
+              border-[#FFC400]
+              text-white
+              rounded-[10px]
+              font-semibold
+              transition-all
+              duration-300
+              hover:bg-[#FFC400]
+              hover:text-black
+            "
           >
-            Lihat Selengkapnya
+            Lihat selengkapnya
           </button>
-
         </div>
 
       </div>
-
     </section>
   );
 }

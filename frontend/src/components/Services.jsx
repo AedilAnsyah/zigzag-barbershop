@@ -11,68 +11,59 @@ export default function Services() {
     {
       title: "Premium Hair cut",
       price: "Rp. 50.000,-",
-      desc: "Termasuk Potong Rambut, Cuci Rambut, Handuk Hangat, Styling, dan Pijat Kepala Ringan.",
+      desc: "termasuk potong rambut, cuci rambut, handuk hangat, pijat kepala, dan minyak rambut",
       icon: haircutIcon,
     },
     {
       title: "Massage",
       price: "Rp. 25.000,-",
-      desc: "Hilangkan penat dan stres dengan layanan massage terbaik kami.",
+      desc: "relaksasi pundak dan kepala setelah mencukur rambut atau saat sedang lelah",
       icon: massageIcon,
     },
     {
       title: "Down Perm",
       price: "Rp. 50.000,-",
-      desc: "Cocok untuk tampilan rambut lebih halus, rapi, dan tidak mengembang.",
+      desc: "menyamarkan rambut tebal di samping supaya terlihat lebih rapi dan rapi",
       icon: permIcon,
     },
   ];
 
   return (
-    <section className="bg-black py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
-
+    <section className="bg-black py-24 border-t border-neutral-900/60">
+      <div className="max-w-7xl mx-auto px-6">
         {/* TITLE */}
-        <div className="text-center">
-          <h2 className="text-white text-[56px] font-bold">
+        <div className="text-center mb-16">
+          <h2 className="text-white text-4xl md:text-5xl font-bold tracking-tight">
             Layanan Kami
           </h2>
 
-          <p className="text-[#BDBDBD] text-[16px] mt-6 max-w-[700px] mx-auto">
-            Tidak perlu antre! Gunakan sistem booking kami untuk memilih waktu
-            yang kamu inginkan dan nikmati layanan tanpa ribet.
+          <p className="text-gray-400 text-sm md:text-base mt-4 max-w-[650px] mx-auto leading-relaxed">
+            klik salah satu layanan di bawah ini untuk memesan jadwal yang Anda inginkan dan nikmati layanan terpopuler kami.
           </p>
         </div>
 
         {/* CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-
+        <div className="flex flex-wrap justify-center gap-8 mt-12">
           {services.map((item, index) => (
             <div
-  key={index}
-  className="
-    bg-[#242424]
-    rounded-[12px]
-    p-8
-    w-[359px]
-    h-[300px]
-  "
->
+              key={index}
+              className="bg-[#1C1C1E] border border-neutral-800/50 rounded-2xl p-8 w-full max-w-[360px] min-h-[280px] flex flex-col justify-start transition-all duration-300 hover:-translate-y-1 hover:border-neutral-700/60 shadow-xl"
+            >
               <img
                 src={item.icon}
                 alt={item.title}
-                className="w-10 h-10 mb-6"
+                className="w-10 h-10 mb-6 object-contain"
               />
 
-              <h3 className="text-white text-[24px] font-bold mb-2">
+              <h3 className="text-white text-xl font-bold mb-2">
                 {item.title}
               </h3>
 
-              <p className="text-[#FFC400] text-[18px] font-bold mb-4">
+              <p className="text-[#FFCC00] text-lg font-bold mb-4">
                 {item.price}
               </p>
 
-              <p className="text-[#A5A5A5] text-[15px] leading-7">
+              <p className="text-gray-400 text-sm leading-relaxed">
                 {item.desc}
               </p>
             </div>
@@ -80,27 +71,14 @@ export default function Services() {
         </div>
 
         {/* BUTTON */}
-        <div className="flex justify-center mt-20">
+        <div className="flex justify-center mt-16">
           <button
             onClick={() => navigate("/layanan")}
-            className="
-              w-[300px]
-              h-[58px]
-              border
-              border-[#FFC400]
-              text-white
-              rounded-[10px]
-              font-semibold
-              transition-all
-              duration-300
-              hover:bg-[#FFC400]
-              hover:text-black
-            "
+            className="w-full max-w-[280px] py-3.5 border border-[#FFCC00] text-white rounded-xl font-semibold transition-all duration-300 hover:bg-[#FFCC00] hover:text-black"
           >
             Lihat selengkapnya
           </button>
         </div>
-
       </div>
     </section>
   );

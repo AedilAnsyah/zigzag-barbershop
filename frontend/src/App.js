@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  useLocation,
 } from "react-router-dom";
 
 // COMPONENTS
@@ -11,6 +12,9 @@ import Footer from "./components/Footer";
 import Services from "./components/Services";
 import OurBarber from "./components/OurBarber";
 import BookingLayanan from "./components/Layanan";
+import AdminRoute from "./components/AdminRoute";
+import AdminLayout from "./components/AdminLayout";
+import Reviews from "./components/Reviews";
 
 // PAGES
 import Home from "./pages/Home";
@@ -18,24 +22,33 @@ import History from "./pages/Riwayat";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Riwayat from "./pages/Riwayat";
+import Profile from "./pages/Profile";
 
 // BOOKING
 import Booking from "./pages/booking/Reservasi";
 import Barber from "./pages/booking/Barber";
 import Waktu from "./pages/booking/Waktu";
 import Ulasan from "./pages/booking/Ulasan";
-import Payment from "./pages/booking/Payment";
+
+// ADMIN PAGES
+import DashboardAdmin from "./pages/admin/DashboardAdmin";
+import ReservasiAdmin from "./pages/admin/ReservasiAdmin";
+import LayananAdmin from "./pages/admin/LayananAdmin";
+import BarberAdmin from "./pages/admin/BarberAdmin";
+import ProfileAdmin from "./pages/admin/ProfileAdmin";
 
 // CSS
 import "./App.css";
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
-    <Router>
+    <>
+      {!isAdminRoute && <Navbar />}
 
-      <Navbar />
-
-      <div style={{ paddingTop: "80px" }}>
+      <div style={isAdminRoute ? {} : { paddingTop: "80px" }}>
 
         <Routes>
 
@@ -46,6 +59,7 @@ function App() {
                 <Home />
                 <Services />
                 <OurBarber />
+                <Reviews />
               </>
             }
           />
@@ -75,10 +89,7 @@ function App() {
             element={<Ulasan />}
           />
 
-          <Route
-            path="/payment"
-            element={<Payment />}
-          />
+
 
           <Route
             path="/history"
@@ -96,16 +107,44 @@ function App() {
           />
 
           <Route
+            path="/profile"
+            element={<Profile />}
+          />
+
+          <Route
             path="/history"
             element={<Riwayat />}
           />
+
+          {/* ADMIN ROUTES */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<DashboardAdmin />} />
+            <Route path="reservasi" element={<ReservasiAdmin />} />
+            <Route path="layanan" element={<LayananAdmin />} />
+            <Route path="barber" element={<BarberAdmin />} />
+            <Route path="profile" element={<ProfileAdmin />} />
+          </Route>
 
         </Routes>
 
       </div>
 
-      <Footer />
+      {!isAdminRoute && <Footer />}
+    </>
+  );
+}
 
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

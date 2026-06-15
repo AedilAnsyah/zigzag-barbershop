@@ -1,13 +1,10 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import heroImage from "../assets/hero.jpg";
 import logo from "../assets/logo.png";
 
 const Home = () => {
   return (
     <div>
-      <Navbar />
-
       <div
         className="hero"
         style={{ backgroundImage: `url(${heroImage})` }}
@@ -17,6 +14,7 @@ const Home = () => {
 
           <p className="desc">
             Potongan rapi, pelayanan terbaik, hasil maksimal.
+            <br />
             Kami hadir untuk memberikan pengalaman grooming yang nyaman
             dengan hasil yang memuaskan.
           </p>

@@ -21,88 +21,47 @@ const OurBarber = () => {
     fetchBarbers();
   }, []);
   return (
-    <section className="bg-black py-28">
-      <div className="max-w-[1440px] mx-auto px-6">
-
+    <section className="bg-black py-24 border-t border-neutral-900/60">
+      <div className="max-w-7xl mx-auto px-6">
         {/* TITLE */}
-        <div className="text-center mb-24">
-          <h2 className="text-white text-[56px] font-bold mb-8">
+        <div className="text-center mb-16">
+          <h2 className="text-white text-4xl md:text-5xl font-bold tracking-tight mb-4">
             Barber Kami
           </h2>
 
-          <p className="text-[#8F8F8F] text-[18px] leading-9 max-w-[1000px] mx-auto">
-            Di Zigzag Barbershop, setiap barber kami bekerja dengan standar yang sama:
-            rapi, detail, dan profesional.
-            <br />
-            Kamu tidak perlu bingung memilih siapapun yang melayani,
-            hasilnya tetap maksimal.
+          <p className="text-gray-400 text-sm md:text-base max-w-[800px] mx-auto leading-relaxed">
+            Di setiap layanan kami, setiap barber kami bekerja dengan standar yang sama: rapi, detail, dan profesional. Kamu tidak perlu bingung memilih siapapun yang melayani, hasilnya tetap maksimal.
           </p>
         </div>
 
         {/* CARD GRID */}
-        <div className="flex flex-wrap justify-center gap-12">
-
-          {loading && (
-            <div className="w-full text-center text-white font-semibold py-10">
-              Memuat barber...
-            </div>
-          )}
-
-          {error && (
-            <div className="w-full text-center text-red-500 font-semibold py-10">
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && barbers.length === 0 && (
-            <div className="w-full text-center text-white font-semibold py-10">
-              Tidak ada barber tersedia saat ini.
-            </div>
-          )}
-
-          {!loading && !error && barbers.map((barber) => (
+        <div className="flex flex-wrap justify-center gap-8">
+          {barbers.map((barber) => (
             <div
               key={barber.id}
-              className="
-                w-[280px]
-                rounded-xl
-                overflow-hidden
-                bg-[#242424]
-                transition-all
-                duration-300
-                hover:-translate-y-2
-              "
+              className="w-full max-w-[260px] rounded-2xl overflow-hidden bg-[#1C1C1E] border border-neutral-800/50 transition-all duration-300 hover:-translate-y-1.5 shadow-xl"
             >
-
               {/* FOTO */}
-              <img
-                src={heroImage}
-                alt={barber.name}
-                className="
-                  w-full
-                  h-[300px]
-                  object-cover
-                "
-              />
-
-              {/* INFO */}
-              <div className="px-4 py-4">
-
-                <h3 className="text-white text-[18px] font-bold mb-1">
-                  {barber.name}
-                </h3>
-
-                <p className="text-[#FFC400] text-[14px]">
-                  Barber Profesional
-                </p>
-
+              <div className="h-[280px] bg-neutral-800 overflow-hidden">
+                <img
+                  src={barber.foto}
+                  alt={barber.nama}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                />
               </div>
 
+              {/* INFO */}
+              <div className="px-5 py-4 text-left">
+                <h3 className="text-white text-lg font-bold">
+                  {barber.nama}
+                </h3>
+                <p className="text-[#FFCC00] text-sm mt-1">
+                  {barber.deskripsi}
+                </p>
+              </div>
             </div>
           ))}
-
         </div>
-
       </div>
     </section>
   );

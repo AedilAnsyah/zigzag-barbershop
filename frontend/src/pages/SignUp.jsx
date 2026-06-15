@@ -23,6 +23,17 @@ export default function SignUp() {
     });
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      // Ambil consent URL dari backend
+      const response = await api.get('/auth/google/url');
+      // Redirect browser ke halaman login Google
+      window.location.href = response.data.url;
+    } catch (error) {
+      alert('Gagal menginisialisasi Google Login. Silakan coba lagi.');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("REGISTER :", formData);
@@ -48,6 +59,7 @@ export default function SignUp() {
           {/* GOOGLE */}
           <button
             type="button"
+            onClick={handleGoogleLogin}
             className="w-full bg-[#767680] hover:bg-[#636366] active:bg-[#48484a] transition-colors rounded-xl py-3.5 flex items-center justify-center gap-3 font-semibold text-white text-sm"
           >
             <img

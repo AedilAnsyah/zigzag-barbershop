@@ -24,6 +24,7 @@ import Reviews from "./components/Reviews";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import GoogleCallback from "./pages/GoogleCallback";
 import Riwayat from "./pages/Riwayat";
 import Profile from "./pages/Profile";
 
@@ -81,6 +82,11 @@ function AppContent() {
           <Route
             path="/daftar"
             element={<SignUp />}
+          />
+
+          <Route
+            path="/auth/callback"
+            element={<GoogleCallback />}
           />
 
           {/* PROTECTED ROUTES */}

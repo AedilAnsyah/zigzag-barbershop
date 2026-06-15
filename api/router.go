@@ -34,6 +34,8 @@ func SetupRouter() *gin.Engine {
 		// Public routes — tidak butuh JWT
 		api.POST("/auth/login", auth.LoginHandler)
 		api.POST("/auth/register", auth.RegisterHandler)
+		api.GET("/auth/google/url", auth.GetGoogleLoginURL)           // [Phase 3] Google OAuth consent URL
+		api.POST("/auth/google/callback", auth.GoogleCallbackHandler) // [Phase 3] Google OAuth code exchange
 		api.GET("/services", service.GetServicesHandler)
 		api.GET("/barbers", barber.GetBarbersHandler)
 

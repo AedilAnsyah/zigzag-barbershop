@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/AuthContext";
+import api from "../services/api";
 import google from "../assets/google.png";
 
 export default function SignIn() {
@@ -21,6 +22,17 @@ export default function SignIn() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      // Ambil consent URL dari backend
+      const response = await api.get('/auth/google/url');
+      // Redirect browser ke halaman login Google
+      window.location.href = response.data.url;
+    } catch (error) {
+      alert('Gagal menginisialisasi Google Login. Silakan coba lagi.');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -56,6 +68,7 @@ export default function SignIn() {
           {/* GOOGLE */}
           <button
             type="button"
+            onClick={handleGoogleLogin}
             className="w-full bg-[#767680] hover:bg-[#636366] active:bg-[#48484a] transition-colors rounded-xl py-3.5 flex items-center justify-center gap-3 font-semibold text-white text-sm"
           >
             <img

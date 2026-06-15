@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { AuthContext } from "../context/AuthContext";
 import google from "../assets/google.png";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -70,6 +75,13 @@ export default function SignIn() {
             <div className="flex-grow h-[1px] bg-neutral-700"></div>
           </div>
 
+          {/* ERROR MESSAGE */}
+          {errorMsg && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-xl mb-5 text-sm">
+              {errorMsg}
+            </div>
+          )}
+
           {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* EMAIL */}
@@ -109,7 +121,7 @@ export default function SignIn() {
               type="submit"
               className="w-full bg-[#FFCC00] hover:bg-yellow-400 active:bg-yellow-500 transition-colors rounded-xl py-3.5 font-bold text-black text-sm mt-2"
             >
-              Masuk
+              {loading ? "Memproses..." : "Masuk"}
             </button>
           </form>
 

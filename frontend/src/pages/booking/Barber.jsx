@@ -1,30 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 import StepBooking from "../../components/StepBooking";
-
-const barbers = [
-  {
-    id: 1,
-    name: "Nama",
-    description: "deskripsi",
-  },
-  {
-    id: 2,
-    name: "Nama",
-    description: "deskripsi",
-  },
-  {
-    id: 3,
-    name: "Nama",
-    description: "deskripsi",
-  },
-  {
-    id: 4,
-    name: "Nama",
-    description: "deskripsi",
-  },
-];
 
 export default function Barber() {
   const navigate = useNavigate();
@@ -32,7 +10,24 @@ export default function Barber() {
 
   const selectedService = location.state?.service;
 
+  const [barbers, setBarbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedBarber, setSelectedBarber] = useState(null);
+
+  useEffect(() => {
+    const fetchBarbers = async () => {
+      try {
+        const response = await api.get("/barbers");
+        setBarbers(response.data.data);
+      } catch (err) {
+        setError("Gagal memuat barber");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBarbers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-black px-[70px] pt-[60px] pb-[80px] text-white">
@@ -68,7 +63,25 @@ export default function Barber() {
           {/* CARD BARBER */}
           <div className="flex flex-wrap gap-[40px] max-w-[965px]">
 
-            {barbers.map((barber) => (
+            {loading && (
+              <div className="w-full text-center text-white font-semibold py-10">
+                Memuat barber...
+              </div>
+            )}
+
+            {error && (
+              <div className="w-full text-center text-red-500 font-semibold py-10">
+                {error}
+              </div>
+            )}
+
+            {!loading && !error && barbers.length === 0 && (
+              <div className="w-full text-center text-white font-semibold py-10">
+                Tidak ada barber tersedia saat ini.
+              </div>
+            )}
+
+            {!loading && !error && barbers.map((barber) => (
 
               <div
                 key={barber.id}
@@ -101,7 +114,7 @@ export default function Barber() {
                   </h3>
 
                   <p className="text-[13px] text-[#FFC400] mt-2">
-                    {barber.description}
+                    Barber Profesional
                   </p>
 
                 </div>
@@ -220,7 +233,7 @@ export default function Barber() {
 
               <span className="text-[#FFC400] text-[24px] font-bold">
                 {selectedService
-                  ? selectedService.price
+                  ? `Rp ${selectedService.price.toLocaleString("id-ID")},-`
                   : "Rp 0"}
               </span>
 

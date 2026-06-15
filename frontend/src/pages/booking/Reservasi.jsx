@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 import StepBooking from "../../components/StepBooking";
 
@@ -7,21 +8,34 @@ import haircut from "../../assets/haircut.png";
 import massage from "../../assets/massage.png";
 import perm from "../../assets/perm.png";
 
-const services = [
-  {
-    id: 1,
-    name: "Premium Hair Cut",
-    price: "Rp 50.000,-",
-    image: haircut,
-    desc: "Termasuk Potong Rambut, Cuci Rambut, Handuk Hangat, Styling dan Pijat Kepala Ringan.",
-  },
-
-];
-
 export default function Reservasi() {
   const navigate = useNavigate();
 
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await api.get("/services");
+        setServices(response.data.data);
+      } catch (err) {
+        setError("Gagal memuat layanan");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const getIcon = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes("massage") || lower.includes("colour")) return massage;
+    if (lower.includes("perm")) return perm;
+    return haircut;
+  };
 
   return (
     <div className="min-h-screen bg-black px-[90px] py-[60px] text-white">
@@ -55,22 +69,38 @@ export default function Reservasi() {
           </p>
 
           <div className="grid grid-cols-3 gap-8">
+            {loading && (
+              <div className="col-span-3 text-center text-white font-semibold py-10">
+                Memuat layanan...
+              </div>
+            )}
 
-            {services.map((service) => (
+            {error && (
+              <div className="col-span-3 text-center text-red-500 font-semibold py-10">
+                {error}
+              </div>
+            )}
 
+            {!loading && !error && services.length === 0 && (
+              <div className="col-span-3 text-center text-white font-semibold py-10">
+                Tidak ada layanan tersedia saat ini.
+              </div>
+            )}
+
+            {!loading && !error && services.map((service) => (
               <div
                 key={service.id}
-                className="
+                className={`
                   bg-[#242424]
                   rounded-[16px]
                   p-6
                   transition-all
                   duration-300
-                "
+                  ${selectedService?.id === service.id ? "ring-2 ring-[#FFC400]" : ""}
+                `}
               >
-
                 <img
-                  src={service.image}
+                  src={getIcon(service.name)}
                   alt={service.name}
                   className="w-8 h-8 mb-5"
                 />
@@ -80,33 +110,31 @@ export default function Reservasi() {
                 </h3>
 
                 <p className="text-[#FFC400] font-bold text-[18px] mt-2">
-                  {service.price}
+                  Rp {service.price.toLocaleString("id-ID")},-
                 </p>
 
                 <p className="text-[#9A9A9A] text-[14px] leading-7 mt-3 min-h-[90px]">
-                  {service.desc}
+                  {service.description}
                 </p>
 
                 <button
                   onClick={() => setSelectedService(service)}
-                  className="
+                  className={`
                     w-full
                     mt-5
                     h-[44px]
-                    bg-[#FFC400]
-                    text-black
                     font-semibold
                     rounded-[8px]
-                    hover:brightness-95
-                  "
+                    transition-all
+                    ${selectedService?.id === service.id 
+                      ? "bg-white text-black hover:bg-gray-200" 
+                      : "bg-[#FFC400] text-black hover:brightness-95"}
+                  `}
                 >
-                  Reservasi
+                  {selectedService?.id === service.id ? "Terpilih" : "Pilih Layanan"}
                 </button>
-
               </div>
-
             ))}
-
           </div>
 
           {/* BUTTON */}
@@ -214,7 +242,7 @@ export default function Reservasi() {
 
               <span className="text-[#FFC400] text-[28px] font-bold">
                 {selectedService
-                  ? selectedService.price
+                  ? `Rp ${selectedService.price.toLocaleString("id-ID")},-`
                   : "Rp 0"}
               </span>
 

@@ -1,34 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import heroImage from "../assets/barber.jpeg";
-
-const barbers = [
-  {
-    id: 1,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 2,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 3,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-  {
-    id: 4,
-    nama: "Nama",
-    deskripsi: "deskripsi",
-    foto: heroImage,
-  },
-];
+import api from "../services/api";
 
 const OurBarber = () => {
+  const [barbers, setBarbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBarbers = async () => {
+      try {
+        const response = await api.get("/barbers");
+        setBarbers(response.data.data.slice(0, 4)); // Tampilkan maksimal 4 barber di beranda
+      } catch (err) {
+        setError("Gagal memuat barber");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBarbers();
+  }, []);
   return (
     <section className="bg-black py-24 border-t border-neutral-900/60">
       <div className="max-w-7xl mx-auto px-6">

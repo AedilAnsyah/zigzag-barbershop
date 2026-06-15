@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import api from "../services/api";
 import google from "../assets/google.png";
 
 export default function SignUp() {
@@ -11,6 +12,9 @@ export default function SignUp() {
     email: "",
     password: "",
   });
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -62,6 +66,13 @@ export default function SignUp() {
             </span>
             <div className="flex-grow h-[1px] bg-neutral-700"></div>
           </div>
+
+          {/* ERROR MESSAGE */}
+          {errorMsg && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-xl mb-5 text-sm">
+              {errorMsg}
+            </div>
+          )}
 
           {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -118,7 +129,7 @@ export default function SignUp() {
               type="submit"
               className="w-full bg-[#FFCC00] hover:bg-yellow-400 active:bg-yellow-500 transition-colors rounded-xl py-3.5 font-bold text-black text-sm mt-2"
             >
-              Buat akun
+              {loading ? "Memproses..." : "Buat akun"}
             </button>
           </form>
 

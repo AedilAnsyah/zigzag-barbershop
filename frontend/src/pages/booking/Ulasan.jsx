@@ -9,6 +9,7 @@ export default function Ulasan() {
   const selectedService = location.state?.service;
   const selectedBarber = location.state?.barber;
   const selectedDate = location.state?.date;
+  const dateRaw = location.state?.dateRaw;
   const selectedTime = location.state?.time;
 
   // Modal states: null, 'confirm', 'qr', 'success'

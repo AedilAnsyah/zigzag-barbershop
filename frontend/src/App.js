@@ -6,6 +6,10 @@ import {
   useLocation,
 } from "react-router-dom";
 
+// CONTEXT
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+
 // COMPONENTS
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -18,7 +22,6 @@ import Reviews from "./components/Reviews";
 
 // PAGES
 import Home from "./pages/Home";
-import History from "./pages/Riwayat";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Riwayat from "./pages/Riwayat";
@@ -52,6 +55,7 @@ function AppContent() {
 
         <Routes>
 
+          {/* PUBLIC ROUTES */}
           <Route
             path="/"
             element={
@@ -65,35 +69,8 @@ function AppContent() {
           />
 
           <Route
-            path="/booking"
-            element={<Booking />}
-          />
-
-          <Route
             path="/layanan"
             element={<BookingLayanan />}
-          />
-
-          <Route
-            path="/barber"
-            element={<Barber />}
-          />
-
-          <Route
-            path="/waktu"
-            element={<Waktu />}
-          />
-
-          <Route
-            path="/review"
-            element={<Ulasan />}
-          />
-
-
-
-          <Route
-            path="/history"
-            element={<History />}
           />
 
           <Route
@@ -106,30 +83,53 @@ function AppContent() {
             element={<SignUp />}
           />
 
-          <Route
-            path="/profile"
-            element={<Profile />}
-          />
+          {/* PROTECTED ROUTES */}
+          <Route element={<PrivateRoute />}>
+            <Route
+              path="/booking"
+              element={<Booking />}
+            />
 
-          <Route
-            path="/history"
-            element={<Riwayat />}
-          />
+            <Route
+              path="/barber"
+              element={<Barber />}
+            />
 
-          {/* ADMIN ROUTES */}
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route index element={<DashboardAdmin />} />
-            <Route path="reservasi" element={<ReservasiAdmin />} />
-            <Route path="layanan" element={<LayananAdmin />} />
-            <Route path="barber" element={<BarberAdmin />} />
-            <Route path="profile" element={<ProfileAdmin />} />
+            <Route
+              path="/waktu"
+              element={<Waktu />}
+            />
+
+            <Route
+              path="/review"
+              element={<Ulasan />}
+            />
+
+            <Route
+              path="/profile"
+              element={<Profile />}
+            />
+
+            <Route
+              path="/history"
+              element={<Riwayat />}
+            />
+
+            {/* ADMIN ROUTES */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
+              <Route index element={<DashboardAdmin />} />
+              <Route path="reservasi" element={<ReservasiAdmin />} />
+              <Route path="layanan" element={<LayananAdmin />} />
+              <Route path="barber" element={<BarberAdmin />} />
+              <Route path="profile" element={<ProfileAdmin />} />
+            </Route>
           </Route>
 
         </Routes>
@@ -143,9 +143,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -33,7 +33,7 @@ Aplikasi ini menggunakan pemisahan yang jelas antara frontend dan backend (decou
 - **Bahasa Pemrograman**: Go (Golang)
 - **Web Framework**: Gin Gonic
 - **Database ORM**: GORM (Object Relational Mapping)
-- **Database**: SQLite (untuk development lokal: `zigzag.db`) / mendukung PostgreSQL
+- **Database / BaaS**: PostgreSQL (Supabase BaaS)
 
 ---
 
@@ -51,7 +51,7 @@ zigzag-barbershop/
 │   └── src/         # Komponen, halaman, dan logika React
 ├── internal/        # Logika bisnis inti backend (Handlers, Services, Repositories)
 ├── pkg/             # Package pembantu backend yang reusable
-└── zigzag.db        # File database lokal SQLite
+└── zigzag.db        # File database lokal SQLite (development/opsional)
 ```
 
 ---

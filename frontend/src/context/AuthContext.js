@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 
@@ -22,10 +22,14 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("token");
           setUser(null);
         } else {
+          const localUserStr = localStorage.getItem('user');
+          const localUser = localUserStr ? JSON.parse(localUserStr) : null;
           setUser({
             id: decoded.user_id,
             email: decoded.email,
             role: decoded.role,
+            name: localUser?.name || decoded.name || decoded.email.split('@')[0],
+            avatar_url: decoded.avatar_url,
           });
         }
       } catch (error) {
@@ -51,13 +55,47 @@ export const AuthProvider = ({ children }) => {
         id: decoded.user_id,
         email: decoded.email,
         role: decoded.role,
+        name: decoded.name || decoded.email.split('@')[0],
+        avatar_url: decoded.avatar_url,
       });
 
-      return { success: true };
+      return { success: true, role: decoded.role };
     } catch (error) {
       return {
         success: false,
         message: error.response?.data?.error || "Gagal masuk. Silakan coba lagi.",
+      };
+    }
+  };
+
+  const loginWithGoogle = async (code) => {
+    try {
+      // Kirim authorization code ke backend
+      const response = await api.post("/auth/google/callback", { code });
+      const { token } = response.data;
+      console.log("Token from backend:", token);
+
+      // Simpan token ke localStorage
+      localStorage.setItem("token", token);
+
+      // Decode JWT token untuk mendapatkan data user
+      const decoded = jwtDecode(token);
+      const userData = {
+        id: decoded.user_id,
+        email: decoded.email,
+        role: decoded.role,
+        name: decoded.name || decoded.email.split('@')[0],
+        avatar_url: decoded.avatar_url,
+      };
+
+      setUser(userData);
+
+      return { success: true, role: decoded.role };
+    } catch (error) {
+      console.error("Google Auth Error:", error.response?.data);
+      return {
+        success: false,
+        message: error.response?.data?.error || "Google login gagal dilakukan",
       };
     }
   };
@@ -68,8 +106,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

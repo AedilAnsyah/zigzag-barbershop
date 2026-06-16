@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import StepBooking from "../../components/StepBooking";
+import api from "../../services/api";
 
 export default function Ulasan() {
   const navigate = useNavigate();
@@ -96,9 +97,33 @@ export default function Ulasan() {
     // Re-draw random payload modules every 2.5 seconds to represent changing QRs
     const qrInterval = setInterval(drawQRCode, 2500);
 
-    // Simulated scan & auto-success after 6 seconds of scanning QR
-    const successTimeout = setTimeout(() => {
-      setActiveModal("success");
+    // Simulated scan & API hit after 6 seconds of scanning QR
+    const successTimeout = setTimeout(async () => {
+      try {
+        let formattedDate = "2026-06-15"; // default fallback
+        if (dateRaw) {
+          formattedDate = new Date(dateRaw).toISOString().split('T')[0];
+        } else if (selectedDate) {
+          try {
+            const d = new Date(selectedDate);
+            if (!isNaN(d)) formattedDate = d.toISOString().split('T')[0];
+          } catch (e) {
+            console.error("Format date failed");
+          }
+        }
+
+        await api.post('/booking', {
+          service_id: parseInt(selectedService?.id) || 1,
+          barber_id: parseInt(selectedBarber?.id) || 1,
+          date: formattedDate,
+          time: (selectedTime || "10:00").replace('.', ':')
+        });
+        setActiveModal("success");
+      } catch (err) {
+        console.error("Gagal booking", err);
+        alert("Gagal melakukan reservasi: " + (err.response?.data?.error || "Kesalahan sistem"));
+        setActiveModal(null);
+      }
     }, 6000);
 
     return () => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiClock,
   FiCalendar,
@@ -7,84 +7,100 @@ import {
 } from "react-icons/fi";
 import StatCard from "../../components/admin/StatCard";
 import BookingTable from "../../components/admin/BookingTable";
+import api from "../../services/api";
 
 export default function DashboardAdmin() {
+  const [reservations, setReservations] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [barberCount, setBarberCount] = useState(0);
+
+  // Update stats dynamically inside the component so it uses state
   const stats = [
     {
       title: "Menunggu Konfirmasi",
-      value: "2",
+      value: reservations.filter(r => r.status === "Menunggu").length.toString(),
       icon: FiClock,
       color: "bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-md shadow-amber-500/5"
     },
     {
       title: "Reservasi hari ini",
-      value: "6",
+      value: reservations.length.toString(),
       icon: FiCalendar,
       color: "bg-blue-500/10 text-blue-500 border border-blue-500/20 shadow-md shadow-blue-500/5"
     },
     {
       title: "Barber Aktif",
-      value: "3/4",
+      value: barberCount.toString(),
       icon: FiScissors,
       color: "bg-green-500/10 text-green-500 border border-green-500/20 shadow-md shadow-green-500/5"
     },
     {
       title: "Pendapatan",
-      value: "Rp 500.000",
+      value: "Rp 50.000",
       icon: FiDollarSign,
       color: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-md shadow-emerald-500/5"
     }
   ];
 
-  const reservations = [
-    {
-      id: 1,
-      name: "Maaruf Sarifudin",
-      service: "Premium Haircut",
-      barber: "?",
-      time: "11 Mei 2026 12.00",
-      price: "Rp 50.000",
-      status: "Menunggu",
-      badgeColor: "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-    },
-    {
-      id: 2,
-      name: "Marshendo Galang",
-      service: "Premium Haircut",
-      barber: "?",
-      time: "11 Mei 2026 15.00",
-      price: "Rp 50.000",
-      status: "Dikonfirmasi",
-      badgeColor: "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-    },
-    {
-      id: 3,
-      name: "Aedil Rizki",
-      service: "Premium Haircut",
-      barber: "?",
-      time: "11 Mei 2026 16.00",
-      price: "Rp 50.000",
-      status: "Dibatalkan",
-      badgeColor: "bg-red-500/10 text-red-500 border border-red-500/20"
-    }
-  ];
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        try {
+          const resBarbers = await api.get('/barbers');
+          const dataBarbers = resBarbers.data.data || [];
+          const activeBarbersCount = dataBarbers.filter(b => b.is_active === true || b.provider !== 'inactive').length;
+          setBarberCount(activeBarbersCount);
+        } catch (e) {}
+        
+        const response = await api.get('/admin/bookings');
+        const data = response.data.data || [];
+        
+        const statusMap = {
+          "pending": "Menunggu",
+          "confirmed": "Dikonfirmasi",
+          "completed": "Selesai",
+          "cancelled": "Dibatalkan"
+        };
 
-  const transactions = [
-    {
-      initials: "MS",
-      name: "Maaruf Sarifudin",
-      service: "Premium Hair Cut",
-      price: "Rp 50.000",
-      time: "Baru saja"
-    },
-    {
-      initials: "MS",
-      name: "Marshendo Galang",
-      service: "Premium Hair Cut",
-      price: "Rp 50.000",
-      time: "12 menit yang lalu"
-    }
-  ];
+        const formattedReservations = data.map(b => {
+          console.log("Raw booking:", b);
+          const mappedStatus = statusMap[b.status] || b.status;
+          return {
+            id: b.ID || b.id,
+            name: b.User?.name || b.User?.email || "User",
+            service: b.Service?.name || "Service",
+            barber: b.Barber?.name || "?",
+            time: `${new Date(b.date).toLocaleDateString('id-ID')} ${b.time}`,
+            price: b.Service?.price ? `Rp ${b.Service.price.toLocaleString('id-ID')}` : "Rp 0",
+            status: mappedStatus,
+            badgeColor: mappedStatus === "Selesai" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                        mappedStatus === "Dibatalkan" ? "bg-red-500/10 text-red-500 border border-red-500/20" :
+                        mappedStatus === "Dikonfirmasi" ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" :
+                        "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+          };
+        });
+        
+        setReservations(formattedReservations);
+
+        const recentTxs = formattedReservations
+          .filter(b => b.status === "Selesai")
+          .slice(0, 5)
+          .map(b => ({
+            initials: (b.name[0] || "U").toUpperCase(),
+            name: b.name,
+            service: b.service,
+            price: b.price,
+            time: b.time
+          }));
+        
+        setTransactions(recentTxs);
+      } catch (error) {
+        console.error("Gagal mengambil data booking", error);
+      }
+    };
+    
+    fetchBookings();
+  }, []);
 
   return (
     <div className="p-8 md:p-10 bg-black min-h-full space-y-10 font-poppins">

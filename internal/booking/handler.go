@@ -186,12 +186,12 @@ func CancelBookingHandler(c *gin.Context) {
 	}
 
 	// Update status menjadi cancelled
-	booking.Status = BookingCancelled
-	if err := database.DB.Save(&booking).Error; err != nil {
+	if err := database.DB.Model(&booking).Update("status", BookingCancelled).Error; err != nil {
 		log.Printf("[Booking DB Error] Update Status Cancel failed: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to cancel booking"})
 		return
 	}
+	booking.Status = BookingCancelled
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "booking cancelled successfully",
@@ -242,6 +242,26 @@ func UpdateBookingStatusHandler(c *gin.Context) {
 		return
 	}
 
+	// 5b. Authorization Check
+	userIDValue, _ := c.Get("user_id")
+	var currentUserID uint
+	switch v := userIDValue.(type) {
+	case uint:
+		currentUserID = v
+	case float64:
+		currentUserID = uint(v)
+	}
+
+	if role == "barber" {
+		if booking.BarberID != currentUserID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Hanya bisa mengubah status pelanggan Anda sendiri"})
+			return
+		}
+	} else if role != "admin" && booking.UserID != currentUserID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Anda tidak memiliki akses"})
+		return
+	}
+
 	// 6. Reject if booking already cancelled or completed
 	if booking.Status == BookingCancelled || booking.Status == BookingCompleted {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "booking cannot be updated"})
@@ -265,12 +285,12 @@ func UpdateBookingStatusHandler(c *gin.Context) {
 	}
 
 	// 9. Update booking status
-	booking.Status = req.Status
-	if err := database.DB.Save(&booking).Error; err != nil {
+	if err := database.DB.Model(&booking).Update("status", req.Status).Error; err != nil {
 		log.Printf("[Booking DB Error] Update Status failed: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update booking status"})
 		return
 	}
+	booking.Status = req.Status
 
 	// 10. Return success response
 	c.JSON(http.StatusOK, gin.H{

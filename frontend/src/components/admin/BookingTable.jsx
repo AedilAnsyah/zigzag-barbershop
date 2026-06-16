@@ -98,49 +98,38 @@ export default function BookingTable({ reservations, showActions = false, onConf
                   {showActions && (
                     <td className="px-6 py-4 text-sm text-center border border-[#E5E7EB]">
                       <div className="flex items-center justify-center gap-2">
-                        {/* FIRST BUTTON (Selesai text or Checkmark icon) */}
-                        {row.status === "Menunggu" || row.status === "Dibatalkan" ? (
+                        {row.status === "Menunggu" && (
+                          <>
+                            {onConfirm && (
+                              <button
+                                onClick={() => onConfirm(row.id)}
+                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm"
+                              >
+                                Konfirmasi
+                              </button>
+                            )}
+                            {onCancel && (
+                              <button
+                                onClick={() => onCancel(row.id)}
+                                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm"
+                              >
+                                Batalkan
+                              </button>
+                            )}
+                          </>
+                        )}
+
+                        {row.status === "Dikonfirmasi" && onComplete && (
                           <button
-                            disabled
-                            className="px-3.5 py-1.5 bg-white text-gray-400 border border-gray-200 rounded-lg text-xs font-bold cursor-not-allowed"
+                            onClick={() => onComplete(row.id)}
+                            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm"
                           >
                             Selesai
                           </button>
-                        ) : row.status === "Dikonfirmasi" ? (
-                          <button
-                            onClick={() => onComplete && onComplete(row.id)}
-                            className="p-1.5 border border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-black rounded-lg cursor-pointer transition-colors"
-                            title="Selesai"
-                          >
-                            <FiCheck size={18} />
-                          </button>
-                        ) : row.status === "Selesai" ? (
-                          <button
-                            disabled
-                            className="p-1.5 border border-green-200 text-green-600 bg-green-50 rounded-lg cursor-not-allowed"
-                          >
-                            <FiCheck size={18} />
-                          </button>
-                        ) : null}
+                        )}
 
-                        {/* SECOND BUTTON (Cancel X, hidden for Selesai) */}
-                        {row.status !== "Selesai" && (
-                          row.status === "Dibatalkan" ? (
-                            <button
-                              disabled
-                              className="p-1.5 border border-gray-200 text-gray-300 bg-gray-50 rounded-lg cursor-not-allowed"
-                            >
-                              <FiX size={18} />
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => onCancel && onCancel(row.id)}
-                              className="p-1.5 border border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-black rounded-lg cursor-pointer transition-colors"
-                              title="Batalkan"
-                            >
-                              <FiX size={18} />
-                            </button>
-                          )
+                        {(row.status === "Selesai" || row.status === "Dibatalkan") && (
+                          <span className="text-gray-400 font-medium">-</span>
                         )}
                       </div>
                     </td>

@@ -1,20 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { user, setUser, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+
+  const getInitialName = () => {
+    const localUserStr = localStorage.getItem('user');
+    if (localUserStr) {
+      try { return JSON.parse(localUserStr).name; } catch(e) {}
+    }
+    return user?.name || "User";
+  };
+
+  const getInitialPhone = () => {
+    const localUserStr = localStorage.getItem('user');
+    if (localUserStr) {
+      try { return JSON.parse(localUserStr).phone || "-"; } catch(e) {}
+    }
+    return "-";
+  };
 
   // Profile data state
   const [profileData, setProfileData] = useState({
-    name: "Maaruf Sarifudin",
-    email: "maarufsarifudin@gmail.com",
-    phone: "08xxxxxx",
-    password: "maaruf123",
+    name: getInitialName(),
+    email: user?.email || "",
+    phone: getInitialPhone(),
+    password: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      const localUserStr = localStorage.getItem('user');
+      let localName = null;
+      let localPhone = null;
+      if (localUserStr) {
+        try { 
+          const parsed = JSON.parse(localUserStr);
+          localName = parsed.name; 
+          localPhone = parsed.phone;
+        } catch(e) {}
+      }
+      setProfileData((prev) => ({
+        ...prev,
+        name: localName || user.name || "User",
+        email: user.email || "",
+        phone: localPhone || "-",
+      }));
+    }
+  }, [user]);
 
   // Form input state (for edit mode)
   const [formData, setFormData] = useState({ ...profileData, confirmPassword: profileData.password });
+
+  useEffect(() => {
+    setFormData({ ...profileData, confirmPassword: profileData.password });
+  }, [profileData]);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -35,9 +79,11 @@ export default function Profile() {
   const handleSave = (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Password konfirmasi tidak cocok!");
-      return;
+    if (formData.password || formData.confirmPassword) {
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Password konfirmasi tidak cocok!");
+        return;
+      }
     }
 
     setProfileData({
@@ -47,14 +93,19 @@ export default function Profile() {
       password: formData.password,
     });
 
-    alert("Profil berhasil diperbarui!");
+    if (user && setUser) {
+      const updatedUser = { ...user, name: formData.name, phone: formData.phone };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
+
+    toast.success("Profil berhasil diperbarui!");
     setIsEditing(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("role");
+    logout();
     navigate("/");
-    window.location.reload();
   };
 
   // Helper to extract initials
@@ -102,9 +153,13 @@ export default function Profile() {
           {/* CARD HEADER */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pb-8 border-b border-neutral-800">
             <div className="flex items-center gap-5">
-              {/* AVATAR initials */}
-              <div className="w-24 h-24 rounded-full bg-[#2C2C2E] border border-neutral-700 text-white font-bold flex items-center justify-center text-3xl shadow-lg select-none">
-                {getInitials(profileData.name)}
+              {/* AVATAR */}
+              <div className="w-24 h-24 rounded-full border border-neutral-700 bg-[#2C2C2E] shadow-lg flex items-center justify-center overflow-hidden select-none">
+                <img
+                  src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=FFB22C&color=000&size=128`}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold tracking-tight">
@@ -242,7 +297,6 @@ export default function Profile() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    required
                     placeholder="Masukkan password baru"
                     className="w-full rounded-xl border border-neutral-700 bg-transparent px-4 py-3 text-white text-sm outline-none focus:border-[#FFCC00] focus:ring-1 focus:ring-[#FFCC00] transition-all"
                   />
@@ -258,7 +312,6 @@ export default function Profile() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    required
                     placeholder="Konfirmasi password baru"
                     className="w-full rounded-xl border border-neutral-700 bg-transparent px-4 py-3 text-white text-sm outline-none focus:border-[#FFCC00] focus:ring-1 focus:ring-[#FFCC00] transition-all"
                   />

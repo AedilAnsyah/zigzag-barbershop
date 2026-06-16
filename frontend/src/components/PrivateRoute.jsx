@@ -1,12 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-[calc(100vh-80px)] bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#FFB22C] border-t-transparent mx-auto" />
+      </div>
+    );
   }
 
   return user ? <Outlet /> : <Navigate to="/masuk" />;

@@ -1,40 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiPlus } from "react-icons/fi";
 import BarberCard from "../../components/admin/BarberCard";
+import api from "../../services/api";
 
 export default function BarberAdmin() {
-  const [barbers, setBarbers] = useState([
-    {
-      id: 1,
-      name: "Aedil Rizki",
-      specialty: ["Classic Cut", "Modern Fade", "Shaving"],
-      desc: "Classic Cut, Modern Fade, Shaving",
-      description: "Classic Cut, Modern Fade, Shaving",
-      rating: 4.9,
-      reviews: 42,
-      isActive: true
-    },
-    {
-      id: 2,
-      name: "Marshendo Galang",
-      specialty: ["Pompadour", "Buzz Cut", "Hair Coloring"],
-      desc: "Pompadour, Buzz Cut, Hair Coloring",
-      description: "Pompadour, Buzz Cut, Hair Coloring",
-      rating: 4.8,
-      reviews: 38,
-      isActive: true
-    },
-    {
-      id: 3,
-      name: "Maaruf Sarifudin",
-      specialty: ["Undercut", "Beard Styling", "Kids Cut"],
-      desc: "Undercut, Beard Styling, Kids Cut",
-      description: "Undercut, Beard Styling, Kids Cut",
-      rating: 4.9,
-      reviews: 50,
-      isActive: false
+  const [barbers, setBarbers] = useState([]);
+
+  const fetchBarbers = async () => {
+    try {
+      const response = await api.get('/barbers');
+      const data = response.data.data || [];
+      const formatted = data.map(b => ({
+        id: b.ID || b.id,
+        name: b.name || "Barber",
+        specialty: b.specialty ? b.specialty.split(',') : [],
+        desc: b.specialty || "Barber profesional",
+        description: b.specialty || "Barber profesional",
+        rating: b.rating || 5.0,
+        reviews: 0,
+        isActive: b.is_active !== undefined ? b.is_active : (b.provider !== 'inactive'),
+        isPresentToday: b.is_present_today || false
+      }));
+      setBarbers(formatted);
+    } catch (err) {
+      console.error("Gagal fetch barbers:", err);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    fetchBarbers();
+  }, []);
 
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -51,12 +46,30 @@ export default function BarberAdmin() {
     }
   };
 
-  const handleToggleActive = (id) => {
-    setBarbers(
-      barbers.map((b) =>
-        b.id === id ? { ...b, isActive: !b.isActive } : b
-      )
-    );
+  const handleToggleActive = async (id) => {
+    if (!id) {
+      console.error("ID Barber tidak ditemukan pada toggle");
+      return;
+    }
+    
+    const barberToToggle = barbers.find(b => b.id === id);
+    if (!barberToToggle) return;
+    
+    const currentStatus = barberToToggle.isActive;
+    const newStatus = !currentStatus;
+
+    // 1. Ubah UI duluan (Optimistic Update)
+    setBarbers(prev => prev.map(b => (b.id === id) ? { ...b, isActive: newStatus } : b));
+
+    try {
+      // 2. Tembak API
+      await api.put(`/admin/barbers/${id}/status`, { is_active: newStatus });
+    } catch (error) {
+      // 3. Jika gagal, kembalikan posisi sakelar dan tampilkan error asli
+      console.error("Gagal update barber:", error.response?.data || error.message);
+      setBarbers(prev => prev.map(b => (b.id === id) ? { ...b, isActive: currentStatus } : b));
+      alert(`Gagal: ${error.response?.data?.error || "Terjadi kesalahan server"}`);
+    }
   };
 
   const handleEditClick = (barber) => {

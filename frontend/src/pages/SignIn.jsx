@@ -1,7 +1,9 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { AuthContext } from "../context/AuthContext";
+import api from "../services/api";
 import google from "../assets/google.png";
 
 export default function SignIn() {
@@ -23,18 +25,42 @@ export default function SignIn() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("LOGIN :", formData);
+  const handleGoogleLogin = async () => {
+    try {
+      // Ambil consent URL dari backend
+      const response = await api.get('/auth/google/url');
+      // Redirect browser ke halaman login Google
+      window.location.href = response.data.url;
+    } catch (error) {
+      toast.error('Gagal menginisialisasi Google Login. Silakan coba lagi.');
+    }
+  };
 
-    if (formData.email === "admin@zigzag.com") {
-      localStorage.setItem("role", "admin");
-      alert("Berhasil Masuk sebagai Admin!");
-      navigate("/admin");
-    } else {
-      localStorage.setItem("role", "user");
-      alert("Berhasil Masuk!");
-      navigate("/");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        if (result.role === "admin") {
+          toast.success("Berhasil Masuk sebagai Admin!");
+          navigate("/admin");
+        } else if (result.role === "barber") {
+          toast.success("Berhasil Masuk sebagai Barber!");
+          navigate("/barber-dashboard"); // Ke halaman dashboard khusus Barber
+        } else {
+          toast.success("Berhasil Masuk!");
+          navigate("/");
+        }
+      } else {
+        toast.error("Login Gagal: " + result.message);
+      }
+    } catch (err) {
+      toast.error("Login Gagal: Terjadi kesalahan sistem");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,6 +82,7 @@ export default function SignIn() {
           {/* GOOGLE */}
           <button
             type="button"
+            onClick={handleGoogleLogin}
             className="w-full bg-[#767680] hover:bg-[#636366] active:bg-[#48484a] transition-colors rounded-xl py-3.5 flex items-center justify-center gap-3 font-semibold text-white text-sm"
           >
             <img

@@ -1,32 +1,43 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.png";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const { user, logout } = useAuth();
+  
   const isAuthPage = location.pathname === "/masuk" || location.pathname === "/daftar";
-  const role = localStorage.getItem("role");
-  const isLoggedIn = !!role;
+  const isLoggedIn = !!user;
+  const role = user?.role;
 
   const handleLogout = () => {
-    localStorage.removeItem("role");
+    logout();
     setDropdownOpen(false);
     navigate("/");
-    window.location.reload();
+  };
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.split(" ");
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
     <nav className="navbar">
       {/* LOGO */}
       <div className="logo">
-        <img
-          src={logo}
-          alt="Logo"
-          style={{ height: "40px" }}
-        />
+        <Link to={role === "barber" ? "/barber-dashboard" : "/"}>
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "40px" }}
+          />
+        </Link>
       </div>
 
       {/* MENU */}
@@ -88,12 +99,12 @@ const Navbar = () => {
 
             {/* USER PROFILE BADGE */}
             <div className="relative">
-              <div
-                className="w-10 h-10 rounded-full bg-[#2C2C2E] border border-neutral-700 text-white font-bold flex items-center justify-center cursor-pointer select-none text-sm hover:border-neutral-500 transition-all shadow-md"
+              <img
+                src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=FFB22C&color=000`}
+                alt="Profile"
+                className="w-10 h-10 rounded-full border border-neutral-700 cursor-pointer hover:border-neutral-500 transition-all shadow-md object-cover select-none"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                MS
-              </div>
+              />
 
               {/* DROPDOWN */}
               {dropdownOpen && (

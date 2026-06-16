@@ -25,11 +25,13 @@ export default function SidebarAdmin({ isSidebarCollapsed, handleLogout }) {
               Z
             </div>
           ) : (
-            <img
-              src={logo}
-              alt="ZigZag Logo"
-              className="h-14 object-contain transition-all duration-300"
-            />
+            <NavLink to="/admin">
+              <img
+                src={logo}
+                alt="ZigZag Logo"
+                className="h-14 object-contain transition-all duration-300"
+              />
+            </NavLink>
           )}
         </div>
 

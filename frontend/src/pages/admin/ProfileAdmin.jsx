@@ -1,13 +1,32 @@
 import React, { useState } from "react";
 import { FiMail, FiPhone, FiMapPin, FiEdit2 } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProfileAdmin() {
+  const { user, setUser } = useAuth();
+  
+  const getInitialName = () => {
+    const localUserStr = localStorage.getItem('admin_profile');
+    if (localUserStr) {
+      try { return JSON.parse(localUserStr).name; } catch(e) {}
+    }
+    return user?.name || "Admin";
+  };
+
+  const getInitialPhone = () => {
+    const localUserStr = localStorage.getItem('admin_profile');
+    if (localUserStr) {
+      try { return JSON.parse(localUserStr).phone || "(+62) 85722730000"; } catch(e) {}
+    }
+    return "(+62) 85722730000";
+  };
+
   const [profile, setProfile] = useState({
-    name: "Aedil Rizki",
-    email: "admin@gmail.com",
-    phone: "(+62) 85722730000",
+    name: getInitialName(),
+    email: user?.email || "admin@gmail.com",
+    phone: getInitialPhone(),
     address: "Taman Kota Purbalingga Jl. A. Yani no. 57, Purbalingga, Jawa Tengah, Indonesia",
-    role: "Admin",
+    role: user?.role === "admin" ? "Admin" : "User",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -27,6 +46,13 @@ export default function ProfileAdmin() {
       phone: tempProfile.phone,
       address: tempProfile.address,
     });
+    
+    if (user && setUser) {
+      const updatedUser = { ...user, name: tempProfile.name, phone: tempProfile.phone };
+      localStorage.setItem('admin_profile', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
+    
     setIsEditing(false);
     alert("Profil berhasil diperbarui!");
   };

@@ -13,13 +13,26 @@ export default function BarberCard({ barber, onToggleActive, onEdit, onDelete })
       <div className="p-6 flex flex-col gap-4">
         {/* Name & Active Toggle Status */}
         <div className="flex items-center justify-between">
-          <div className="text-left">
+          <div className="text-left flex flex-col items-start">
             <h3 className="text-white font-bold text-lg leading-tight">
               {barber.name}
             </h3>
             <p className="text-[#FFCC00] text-xs font-semibold mt-1">
               {barber.description || barber.desc || "deskripsi"}
             </p>
+            {barber.isPresentToday !== undefined && (
+              <div className="mt-2">
+                {barber.isPresentToday ? (
+                  <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded border border-green-500/20 font-medium">
+                    ✅ Hadir Hari Ini
+                  </span>
+                ) : (
+                  <span className="text-[10px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 font-medium">
+                    ❌ Belum Absen
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Toggle Switch */}

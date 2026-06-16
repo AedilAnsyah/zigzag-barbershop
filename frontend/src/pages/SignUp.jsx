@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import api from "../services/api";
 import google from "../assets/google.png";
@@ -23,11 +24,36 @@ export default function SignUp() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleGoogleLogin = async () => {
+    try {
+      // Ambil consent URL dari backend
+      const response = await api.get('/auth/google/url');
+      // Redirect browser ke halaman login Google
+      window.location.href = response.data.url;
+    } catch (error) {
+      toast.error('Gagal menginisialisasi Google Login. Silakan coba lagi.');
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("REGISTER :", formData);
-    alert("Akun berhasil dibuat!");
-    navigate("/masuk");
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      await api.post("/auth/register", {
+        name: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+        role: "customer"
+      });
+      toast.success("Akun berhasil dibuat! Silakan masuk.");
+      navigate("/masuk");
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || "Gagal membuat akun. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +74,7 @@ export default function SignUp() {
           {/* GOOGLE */}
           <button
             type="button"
+            onClick={handleGoogleLogin}
             className="w-full bg-[#767680] hover:bg-[#636366] active:bg-[#48484a] transition-colors rounded-xl py-3.5 flex items-center justify-center gap-3 font-semibold text-white text-sm"
           >
             <img

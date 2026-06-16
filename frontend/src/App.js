@@ -1,4 +1,5 @@
 import React from "react";
+import { Toaster } from "react-hot-toast";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +18,7 @@ import Services from "./components/Services";
 import OurBarber from "./components/OurBarber";
 import BookingLayanan from "./components/Layanan";
 import AdminRoute from "./components/AdminRoute";
+import BarberRoute from "./components/BarberRoute";
 import AdminLayout from "./components/AdminLayout";
 import Reviews from "./components/Reviews";
 
@@ -44,12 +46,16 @@ import ProfileAdmin from "./pages/admin/ProfileAdmin";
 // CSS
 import "./App.css";
 
+// BARBER
+import DashboardBarber from "./pages/barber/DashboardBarber";
+
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <>
+      <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
       {!isAdminRoute && <Navbar />}
 
       <div style={isAdminRoute ? {} : { paddingTop: "80px" }}>
@@ -136,6 +142,16 @@ function AppContent() {
               <Route path="barber" element={<BarberAdmin />} />
               <Route path="profile" element={<ProfileAdmin />} />
             </Route>
+
+            {/* BARBER ROUTES */}
+            <Route
+              path="/barber-dashboard"
+              element={
+                <BarberRoute>
+                  <DashboardBarber />
+                </BarberRoute>
+              }
+            />
           </Route>
 
         </Routes>

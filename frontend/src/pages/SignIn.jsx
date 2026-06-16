@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
@@ -31,22 +32,35 @@ export default function SignIn() {
       // Redirect browser ke halaman login Google
       window.location.href = response.data.url;
     } catch (error) {
-      alert('Gagal menginisialisasi Google Login. Silakan coba lagi.');
+      toast.error('Gagal menginisialisasi Google Login. Silakan coba lagi.');
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("LOGIN :", formData);
+    setLoading(true);
+    setErrorMsg("");
 
-    if (formData.email === "admin@zigzag.com") {
-      localStorage.setItem("role", "admin");
-      alert("Berhasil Masuk sebagai Admin!");
-      navigate("/admin");
-    } else {
-      localStorage.setItem("role", "user");
-      alert("Berhasil Masuk!");
-      navigate("/");
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        if (result.role === "admin") {
+          toast.success("Berhasil Masuk sebagai Admin!");
+          navigate("/admin");
+        } else if (result.role === "barber") {
+          toast.success("Berhasil Masuk sebagai Barber!");
+          navigate("/barber-dashboard"); // Ke halaman dashboard khusus Barber
+        } else {
+          toast.success("Berhasil Masuk!");
+          navigate("/");
+        }
+      } else {
+        toast.error("Login Gagal: " + result.message);
+      }
+    } catch (err) {
+      toast.error("Login Gagal: Terjadi kesalahan sistem");
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -58,6 +58,12 @@ func seedUsers(db *gorm.DB) {
 			Password: hashPassword("123456"),
 			Role:     "customer",
 		},
+		{
+			Name:     "Budi Pelanggan",
+			Email:    "customer@zigzag.com",
+			Password: hashPassword("password123"),
+			Role:     "customer",
+		},
 	}
 
 	for _, u := range users {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,21 +8,28 @@ const GoogleCallback = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
     const code = searchParams.get('code');
-    if (code) {
+    
+    // Jika ada kode dan belum pernah di-fetch sebelumnya
+    if (code && !hasFetched.current) {
+      hasFetched.current = true; // Langsung kunci agar render kedua tidak masuk sini
+      
       loginWithGoogle(code)
         .then((result) => {
           if (result.success) {
-            // Berhasil login, redirect ke halaman utama/dashboard
-            navigate('/');
+            // Berhasil login, redirect ke halaman utama/dashboard dengan delay
+            setTimeout(() => navigate('/'), 500);
           } else {
+            console.error("Google Auth Error:", result.message);
             setError(result.message);
             // Sediakan fallback redirect jika gagal setelah 3 detik
             setTimeout(() => navigate('/masuk'), 3000);
           }
         });
-    } else {
+    } else if (!code) {
       navigate('/masuk');
     }
   }, [searchParams, loginWithGoogle, navigate]);

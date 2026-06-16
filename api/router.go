@@ -1,8 +1,10 @@
 package api
 
 import (
+	"os"
 	"time"
 
+	"zigzag-barbershop/internal/attendance"
 	"zigzag-barbershop/internal/auth"
 	"zigzag-barbershop/internal/barber"
 	"zigzag-barbershop/internal/booking"
@@ -18,9 +20,13 @@ func SetupRouter() *gin.Engine {
 
 	// ─── CORS Middleware ───────────────────────────────────────────────────────
 	// Izinkan frontend React (localhost:3000) mengakses API ini.
-	// Untuk production, ganti AllowOrigins dengan domain yang sebenarnya.
+	allowedOrigins := []string{"http://localhost:3000"}
+	if prodOrigin := os.Getenv("FRONTEND_URL"); prodOrigin != "" {
+		allowedOrigins = append(allowedOrigins, prodOrigin)
+	}
+
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -32,8 +38,8 @@ func SetupRouter() *gin.Engine {
 	api := router.Group("/api")
 	{
 		// Public routes — tidak butuh JWT
-		api.POST("/auth/login", auth.LoginHandler)
-		api.POST("/auth/register", auth.RegisterHandler)
+		api.POST("/auth/login", middleware.RateLimitMiddleware(5, time.Minute), auth.LoginHandler)
+		api.POST("/auth/register", middleware.RateLimitMiddleware(5, time.Minute), auth.RegisterHandler)
 		api.GET("/auth/google/url", auth.GetGoogleLoginURL)           // [Phase 3] Google OAuth consent URL
 		api.POST("/auth/google/callback", auth.GoogleCallbackHandler) // [Phase 3] Google OAuth code exchange
 		api.GET("/services", service.GetServicesHandler)
@@ -43,12 +49,13 @@ func SetupRouter() *gin.Engine {
 		protected := api.Group("/")
 		protected.Use(middleware.AuthMiddleware())
 		{
-			protected.POST("/booking", booking.CreateBookingHandler)
+			protected.POST("/booking", middleware.RateLimitMiddleware(10, time.Minute), booking.CreateBookingHandler)
 			protected.GET("/booking", booking.GetBookingHistoryHandler)
 			protected.PUT("/booking/:id/cancel", booking.CancelBookingHandler)
 			protected.PUT("/booking/:id/status", booking.UpdateBookingStatusHandler)
 			protected.POST("/payment", func(c *gin.Context) {})
-			protected.POST("/attendance", func(c *gin.Context) {})
+			protected.POST("/attendance", attendance.CreateAttendanceHandler)
+			protected.GET("/attendance/status", attendance.CheckAttendanceHandler)
 			protected.GET("/report", func(c *gin.Context) {})
 		}
 
@@ -58,6 +65,16 @@ func SetupRouter() *gin.Engine {
 		admin.Use(middleware.RequireRole("admin"))
 		{
 			admin.POST("/services", service.CreateServiceHandler)
+			admin.GET("/bookings", auth.GetAdminBookingsHandler)
+			admin.PUT("/barbers/:id/status", auth.UpdateBarberStatusHandler)
+		}
+
+		// Barber-only routes
+		barberRoute := api.Group("/barber")
+		barberRoute.Use(middleware.AuthMiddleware())
+		barberRoute.Use(middleware.RequireRole("barber"))
+		{
+			barberRoute.GET("/bookings", auth.GetAdminBookingsHandler)
 		}
 	}
 

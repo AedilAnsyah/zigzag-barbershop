@@ -22,7 +22,7 @@ Aplikasi menggunakan pola arsitektur Client-Server. Frontend (SPA React) berkomu
 ```mermaid
 graph LR
     Client[Frontend: React SPA on Firebase] <-->|HTTP / REST API| Server[Backend: Go/Gin on Render]
-    Server <-->|GORM (TCP)| DB[("Supabase PostgreSQL")]
+    Server <-->|GORM TCP| DB[Supabase PostgreSQL]
 ```
 
 ## ⚙️ Cara Setup & Run Secara Lokal

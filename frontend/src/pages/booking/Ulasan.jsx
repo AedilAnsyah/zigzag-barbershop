@@ -235,7 +235,7 @@ export default function Ulasan() {
                     {selectedService?.name || "-"}
                   </p>
                   <p className="text-[#FFCC00] font-bold">
-                    {selectedService?.price || "Rp 0"}
+                    Rp {Number(selectedService?.price || 0).toLocaleString("id-ID")}
                   </p>
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function Ulasan() {
                   Total
                 </h3>
                 <h3 className="text-3xl text-[#FFCC00] font-extrabold">
-                  {selectedService?.price || "Rp 0"}
+                  Rp {Number(selectedService?.price || 0).toLocaleString("id-ID")}
                 </h3>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function Ulasan() {
                   TOTAL
                 </span>
                 <span className="text-[#FFCC00] text-2xl font-extrabold">
-                  {selectedService?.price || "Rp 0"}
+                  Rp {Number(selectedService?.price || 0).toLocaleString("id-ID")}
                 </span>
               </div>
             </div>
@@ -336,7 +336,7 @@ export default function Ulasan() {
                   <span className="text-neutral-500 text-xs font-semibold uppercase tracking-wider">Layanan</span>
                   <div className="text-right">
                     <p className="text-white font-medium">{selectedService?.name || "-"}</p>
-                    <p className="text-xs text-neutral-500">{selectedService?.price || "Rp 0"}</p>
+                    <p className="text-xs text-neutral-500">Rp {Number(selectedService?.price || 0).toLocaleString("id-ID")}</p>
                   </div>
                 </div>
 
@@ -358,7 +358,7 @@ export default function Ulasan() {
                 <div className="border-t border-neutral-800/60 pt-4 flex justify-between items-center">
                   <span className="text-base font-bold text-white uppercase tracking-wider">Total</span>
                   <span className="text-xl font-bold text-[#FFCC00]">
-                    {selectedService?.price || "Rp. ,-"}
+                    Rp {Number(selectedService?.price || 0).toLocaleString("id-ID")}
                   </span>
                 </div>
               </div>

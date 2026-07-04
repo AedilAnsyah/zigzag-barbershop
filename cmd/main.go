@@ -10,6 +10,7 @@ import (
 	"zigzag-barbershop/database"
 	"zigzag-barbershop/database/seed"
 	"zigzag-barbershop/internal/attendance"
+	"zigzag-barbershop/internal/auth"
 	"zigzag-barbershop/internal/booking"
 	"zigzag-barbershop/internal/payment"
 	"zigzag-barbershop/internal/service"
@@ -28,6 +29,9 @@ func main() {
 	}
 
 	cfg := config.LoadConfig()
+
+	// Enforce fail-fast check for JWT secret
+	auth.InitJWT()
 
 	database.ConnectDB()
 

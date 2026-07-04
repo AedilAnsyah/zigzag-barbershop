@@ -1,1 +1,18 @@
+# Environments
 .env
+.env.*
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Logs
+*.log
+
+# Misc
+.DS_Store

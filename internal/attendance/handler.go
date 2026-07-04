@@ -2,15 +2,11 @@ package attendance
 
 import (
 	"net/http"
-	"time"
-
-	"zigzag-barbershop/database"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateAttendanceHandler(c *gin.Context) {
-	// Ambil user_id
 	userIDValue, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -24,23 +20,14 @@ func CreateAttendanceHandler(c *gin.Context) {
 		barberID = uint(v)
 	}
 
-	today := time.Now().Format("2006-01-02")
-	var att Attendance
-	
-	// Cek apakah sudah absen hari ini
-	if err := database.DB.Where("barber_id = ? AND date = ?", barberID, today).First(&att).Error; err == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Sudah absen hari ini"})
-		return
-	}
-
-	att = Attendance{
-		BarberID: barberID,
-		Date:     today,
-		Status:   "present",
-	}
-
-	if err := database.DB.Create(&att).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mencatat absensi"})
+	svc := NewAttendanceService()
+	att, err := svc.CreateAttendance(barberID)
+	if err != nil {
+		if err.Error() == "Sudah absen hari ini" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -57,11 +44,7 @@ func CheckAttendanceHandler(c *gin.Context) {
 		barberID = uint(v)
 	}
 
-	today := time.Now().Format("2006-01-02")
-	var att Attendance
-	if err := database.DB.Where("barber_id = ? AND date = ?", barberID, today).First(&att).Error; err == nil {
-		c.JSON(http.StatusOK, gin.H{"is_present_today": true})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"is_present_today": false})
+	svc := NewAttendanceService()
+	isPresent := svc.CheckAttendance(barberID)
+	c.JSON(http.StatusOK, gin.H{"is_present_today": isPresent})
 }

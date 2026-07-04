@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import SidebarAdmin from "./admin/SidebarAdmin";
 import NavbarAdmin from "./admin/NavbarAdmin";
+import { useAuth } from "../context/AuthContext";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("role");
+    logout();
     alert("Berhasil keluar dari admin!");
     navigate("/masuk");
   };

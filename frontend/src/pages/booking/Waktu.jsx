@@ -29,6 +29,24 @@ export default function Waktu() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");
 
+  const getFilteredTimes = () => {
+    if (!selectedDate) return availableTimes;
+    
+    const now = new Date();
+    // Jika tanggal yang dipilih adalah hari ini, filter jam yang sudah lewat
+    if (selectedDate.toDateString() === now.toDateString()) {
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      return availableTimes.filter(time => {
+        const [hour, minute] = time.split('.').map(Number);
+        return hour > currentHour || (hour === currentHour && minute > currentMinute);
+      });
+    }
+    return availableTimes;
+  };
+
+  const filteredTimes = getFilteredTimes();
+
   return (
     <div className="min-h-screen bg-black px-[70px] pt-[60px] pb-[80px] text-white">
 
@@ -97,26 +115,30 @@ export default function Waktu() {
           {/* TIME */}
           <div className="grid grid-cols-5 gap-5">
 
-            {availableTimes.map((time) => (
-
-              <button
-                key={time}
-                onClick={() => setSelectedTime(time)}
-                className={`
-                  h-[60px]
-                  rounded-[12px]
-                  font-semibold
-                  transition-all
-                  ${selectedTime === time
-                    ? "bg-[#FFC400] text-black"
-                    : "bg-[#242424] text-white hover:border-[#FFC400] border border-transparent"
-                  }
-                `}
-              >
-                {time}
-              </button>
-
-            ))}
+            {filteredTimes.length > 0 ? (
+              filteredTimes.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => setSelectedTime(time)}
+                  className={`
+                    h-[60px]
+                    rounded-[12px]
+                    font-semibold
+                    transition-all
+                    ${selectedTime === time
+                      ? "bg-[#FFC400] text-black"
+                      : "bg-[#242424] text-white hover:border-[#FFC400] border border-transparent"
+                    }
+                  `}
+                >
+                  {time}
+                </button>
+              ))
+            ) : (
+              <div className="col-span-5 text-[#8A8A8A] italic text-center py-4 bg-[#242424] rounded-[12px]">
+                Mohon maaf, jam operasional untuk hari ini sudah terlewat. Silakan pilih hari besok.
+              </div>
+            )}
 
           </div>
 
@@ -162,7 +184,7 @@ export default function Waktu() {
                         year: "numeric",
                       })
                       : "",
-                    dateRaw: selectedDate ? selectedDate.toISOString() : null,
+                    dateRaw: selectedDate ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}` : null,
                     time: selectedTime,
                   },
                 })
@@ -247,7 +269,7 @@ export default function Waktu() {
 
             <span className="text-[28px] font-bold text-[#FFC400]">
               {selectedService
-                ? selectedService.price
+                ? `Rp ${Number(selectedService.price).toLocaleString("id-ID")}`
                 : "Rp 0"}
             </span>
 

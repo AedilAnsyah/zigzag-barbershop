@@ -13,6 +13,7 @@ export default function DashboardAdmin() {
   const [reservations, setReservations] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [barberCount, setBarberCount] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   // Update stats dynamically inside the component so it uses state
   const stats = [
@@ -36,7 +37,7 @@ export default function DashboardAdmin() {
     },
     {
       title: "Pendapatan",
-      value: "Rp 50.000",
+      value: `Rp ${totalRevenue.toLocaleString('id-ID')}`,
       icon: FiDollarSign,
       color: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-md shadow-emerald-500/5"
     }
@@ -61,6 +62,11 @@ export default function DashboardAdmin() {
           "completed": "Selesai",
           "cancelled": "Dibatalkan"
         };
+
+        const revenue = data
+          .filter(b => b.status === "completed")
+          .reduce((sum, b) => sum + (b.Service?.price || 0), 0);
+        setTotalRevenue(revenue);
 
         const formattedReservations = data.map(b => {
           console.log("Raw booking:", b);

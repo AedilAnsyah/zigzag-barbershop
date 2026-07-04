@@ -85,14 +85,19 @@ export default function Barber() {
 
               <div
                 key={barber.id}
-                onClick={() => setSelectedBarber(barber)}
+                onClick={() => {
+                  if (barber.is_present_today) {
+                    setSelectedBarber(barber);
+                  }
+                }}
                 className={`
+                  relative
                   w-[295px]
                   h-[420px]
                   rounded-[12px]
                   overflow-hidden
                   bg-[#242424]
-                  cursor-pointer
+                  ${barber.is_present_today ? "cursor-pointer hover:border-[#FFC400]/50" : "cursor-not-allowed opacity-60"}
                   transition-all
                   duration-300
                   ${
@@ -102,6 +107,14 @@ export default function Barber() {
                   }
                 `}
               >
+
+                {!barber.is_present_today && (
+                  <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center">
+                    <span className="bg-red-500/90 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                      Belum Hadir
+                    </span>
+                  </div>
+                )}
 
                 {/* FOTO */}
                 <div className="h-[340px] bg-[#D9D9D9]"></div>

@@ -8,15 +8,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// GetSecretKey membaca JWT secret dari environment variable JWT_SECRET.
-// Jika tidak di-set, gunakan nilai default dan cetak peringatan.
-func GetSecretKey() []byte {
+var jwtSecret []byte
+
+func InitJWT() {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		log.Println("[WARNING] JWT_SECRET tidak di-set. Menggunakan nilai default — JANGAN digunakan di production!")
-		secret = "zigzag-secret-dev-only"
+		log.Fatal("JWT_SECRET environment variable is required at startup")
 	}
-	return []byte(secret)
+	jwtSecret = []byte(secret)
+}
+
+func GetSecretKey() []byte {
+	return jwtSecret
 }
 
 type Claims struct {

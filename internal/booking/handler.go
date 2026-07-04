@@ -106,10 +106,8 @@ func CreateBookingHandler(c *gin.Context) {
 		// Log detailed error ke terminal
 		log.Printf("[Booking DB Error] Create failed: %v", err)
 
-		// Return detailed error ke response JSON untuk keperluan debugging
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "failed to create booking",
-			"details": err.Error(),
+			"error": "Gagal memproses reservasi",
 		})
 		return
 	}

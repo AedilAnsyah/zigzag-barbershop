@@ -2,6 +2,7 @@ package seed
 
 import (
 	"log"
+	"os"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,47 +22,60 @@ func hashPassword(plain string) string {
 
 // seedUsers membuat akun user awal jika belum ada (cek via email).
 func seedUsers(db *gorm.DB) {
+	adminPass := os.Getenv("SEED_ADMIN_PASSWORD")
+	if adminPass == "" {
+		log.Fatalf("[Seed] SEED_ADMIN_PASSWORD is required")
+	}
+	barberPass := os.Getenv("SEED_BARBER_PASSWORD")
+	if barberPass == "" {
+		log.Fatalf("[Seed] SEED_BARBER_PASSWORD is required")
+	}
+	customerPass := os.Getenv("SEED_CUSTOMER_PASSWORD")
+	if customerPass == "" {
+		log.Fatalf("[Seed] SEED_CUSTOMER_PASSWORD is required")
+	}
+
 	users := []user.User{
 		{
 			Name:     "Admin Zig-Zag",
 			Email:    "admin@zigzag.com",
-			Password: hashPassword("admin123"),
+			Password: hashPassword(adminPass),
 			Role:     "admin",
 		},
 		{
 			Name:     "Rizky Barber",
 			Email:    "rizky@zigzag.com",
-			Password: hashPassword("barber123"),
+			Password: hashPassword(barberPass),
 			Role:     "barber",
 		},
 		{
 			Name:     "Andi Barber",
 			Email:    "andi@zigzag.com",
-			Password: hashPassword("barber123"),
+			Password: hashPassword(barberPass),
 			Role:     "barber",
 		},
 		{
 			Name:     "Fajar Barber",
 			Email:    "fajar@zigzag.com",
-			Password: hashPassword("barber123"),
+			Password: hashPassword(barberPass),
 			Role:     "barber",
 		},
 		{
 			Name:     "Wildan Barber",
 			Email:    "wildan@zigzag.com",
-			Password: hashPassword("barber123"),
+			Password: hashPassword(barberPass),
 			Role:     "barber",
 		},
 		{
 			Name:     "Test Customer",
 			Email:    "test@test.com",
-			Password: hashPassword("123456"),
+			Password: hashPassword(customerPass),
 			Role:     "customer",
 		},
 		{
 			Name:     "Budi Pelanggan",
 			Email:    "customer@zigzag.com",
-			Password: hashPassword("password123"),
+			Password: hashPassword(customerPass),
 			Role:     "customer",
 		},
 	}

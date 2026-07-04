@@ -20,7 +20,11 @@ func SetupRouter() *gin.Engine {
 
 	// ─── CORS Middleware ───────────────────────────────────────────────────────
 	// Izinkan frontend React (localhost:3000) mengakses API ini.
-	allowedOrigins := []string{"http://localhost:3000"}
+	allowedOrigins := []string{
+		"http://localhost:3000",
+		"https://zigzag-barbershop-fd544.web.app",
+		"https://zigzag-barbershop-fd544.firebaseapp.com",
+	}
 	if prodOrigin := os.Getenv("FRONTEND_URL"); prodOrigin != "" {
 		allowedOrigins = append(allowedOrigins, prodOrigin)
 	}

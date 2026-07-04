@@ -10,10 +10,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAdminBookingsHandler mengambil semua reservasi secara global untuk dashboard admin
+// GetAdminBookingsHandler mengambil semua reservasi secara global untuk dashboard admin (dan barber)
 func GetAdminBookingsHandler(c *gin.Context) {
 	var bookings []booking.Booking
 	db := database.DB
+
+	// Cek role untuk menerapkan filter spesifik
+	roleValue, exists := c.Get("role")
+	if exists {
+		role, _ := roleValue.(string)
+		if role == "barber" {
+			userIDValue, _ := c.Get("user_id")
+			var currentUserID uint
+			switch v := userIDValue.(type) {
+			case uint:
+				currentUserID = v
+			case float64:
+				currentUserID = uint(v)
+			}
+			db = db.Where("barber_id = ?", currentUserID)
+		}
+	}
 
 	// Preload relasi untuk memunculkan detail User, Barber, dan Service
 	if err := db.Preload("User").Preload("Barber").Preload("Service").Order("created_at desc").Find(&bookings).Error; err != nil {

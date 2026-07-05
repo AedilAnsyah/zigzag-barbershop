@@ -46,6 +46,7 @@ const OurBarber = () => {
                 <img
                   src={barber.avatar_url || `https://ui-avatars.com/api/?name=${barber.name || 'Barber'}&background=FFB22C&color=000&size=256`}
                   alt={barber.name || "Barber"}
+                  referrerPolicy="no-referrer"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>

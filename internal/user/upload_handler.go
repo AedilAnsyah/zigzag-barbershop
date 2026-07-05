@@ -128,8 +128,7 @@ func UploadPhotoHandler(c *gin.Context) {
 
 	// Save new AvatarURL to database
 	newAvatarURL := publicBaseURL + newFilename
-	user.AvatarURL = newAvatarURL
-	if err := database.DB.Save(&user).Error; err != nil {
+	if err := database.DB.Model(&user).Update("avatar_url", newAvatarURL).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save profile changes"})
 		return
 	}

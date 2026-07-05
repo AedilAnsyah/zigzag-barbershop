@@ -102,6 +102,7 @@ const Navbar = () => {
               <img
                 src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=FFB22C&color=000`}
                 alt="Profile"
+                referrerPolicy="no-referrer"
                 className="w-10 h-10 rounded-full border border-neutral-700 cursor-pointer hover:border-neutral-500 transition-all shadow-md object-cover select-none"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               />

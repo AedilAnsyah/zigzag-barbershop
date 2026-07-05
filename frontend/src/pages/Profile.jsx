@@ -245,6 +245,7 @@ export default function Profile() {
                 <img
                   src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=FFB22C&color=000&size=128`}
                   alt="Profile"
+                  referrerPolicy="no-referrer"
                   className={`w-full h-full object-cover ${isUploading ? 'opacity-50' : 'opacity-100'} transition-opacity`}
                 />
               </div>

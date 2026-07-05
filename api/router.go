@@ -9,6 +9,7 @@ import (
 	"zigzag-barbershop/internal/barber"
 	"zigzag-barbershop/internal/booking"
 	"zigzag-barbershop/internal/service"
+	"zigzag-barbershop/internal/user"
 	"zigzag-barbershop/pkg/middleware"
 
 	"github.com/gin-contrib/cors"
@@ -61,6 +62,10 @@ func SetupRouter() *gin.Engine {
 			protected.POST("/attendance", attendance.CreateAttendanceHandler)
 			protected.GET("/attendance/status", attendance.CheckAttendanceHandler)
 			protected.GET("/report", func(c *gin.Context) {})
+			
+			// Profile endpoints
+			protected.GET("/profile", user.GetProfileHandler)
+			protected.PUT("/profile", user.UpdateProfileHandler)
 		}
 
 		// Admin-only routes — butuh JWT + role admin

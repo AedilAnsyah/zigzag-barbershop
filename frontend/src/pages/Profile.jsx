@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import api from "../services/api";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -50,6 +51,24 @@ export default function Profile() {
         email: user.email || "",
         phone: localPhone || "-",
       }));
+
+      // Fetch latest profile from backend
+      api.get("/profile")
+        .then((res) => {
+          setProfileData((prev) => ({
+            ...prev,
+            name: res.data.name || prev.name,
+            email: res.data.email || prev.email,
+            phone: res.data.phone || prev.phone,
+          }));
+          
+          if (setUser) {
+             const updatedUser = { ...user, name: res.data.name, phone: res.data.phone };
+             localStorage.setItem('user', JSON.stringify(updatedUser));
+             setUser(updatedUser);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch profile", err));
     }
   }, [user]);
 
@@ -76,7 +95,7 @@ export default function Profile() {
     setIsEditing(false);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
     if (formData.password || formData.confirmPassword) {
@@ -86,21 +105,32 @@ export default function Profile() {
       }
     }
 
-    setProfileData({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-    });
+    try {
+      await api.put("/profile", {
+        name: formData.name,
+        phone: formData.phone,
+        password: formData.password,
+      });
 
-    if (user && setUser) {
-      const updatedUser = { ...user, name: formData.name, phone: formData.phone };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      setProfileData({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+
+      if (user && setUser) {
+        const updatedUser = { ...user, name: formData.name, phone: formData.phone };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      }
+
+      toast.success("Profil berhasil diperbarui!");
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Gagal memperbarui profil.");
     }
-
-    toast.success("Profil berhasil diperbarui!");
-    setIsEditing(false);
   };
 
   const handleLogout = () => {

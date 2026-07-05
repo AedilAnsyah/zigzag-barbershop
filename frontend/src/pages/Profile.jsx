@@ -34,7 +34,7 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       const localUserStr = localStorage.getItem('user');
       let localName = null;
       let localPhone = null;
@@ -63,21 +63,28 @@ export default function Profile() {
           }));
           
           if (setUser) {
-             const updatedUser = { ...user, name: res.data.name, phone: res.data.phone };
-             localStorage.setItem('user', JSON.stringify(updatedUser));
-             setUser(updatedUser);
+             // We must safely update user without causing an infinite loop
+             setUser((prevUser) => {
+               if (!prevUser) return prevUser;
+               const updated = { ...prevUser, name: res.data.name, phone: res.data.phone };
+               localStorage.setItem('user', JSON.stringify(updated));
+               return updated;
+             });
           }
         })
         .catch((err) => console.error("Failed to fetch profile", err));
     }
-  }, [user]);
+  }, [user?.id]); // Only re-run if the user ID changes, not the whole object reference!
 
   // Form input state (for edit mode)
   const [formData, setFormData] = useState({ ...profileData, confirmPassword: profileData.password });
 
+  // Only reset formData from profileData when entering edit mode, not continuously!
   useEffect(() => {
-    setFormData({ ...profileData, confirmPassword: profileData.password });
-  }, [profileData]);
+    if (!isEditing) {
+      setFormData({ ...profileData, confirmPassword: profileData.password });
+    }
+  }, [profileData, isEditing]);
 
   const handleInputChange = (e) => {
     setFormData({

@@ -54,19 +54,20 @@ func UpdateProfileHandler(c *gin.Context) {
 	}
 
 	// Update fields
+	updates := map[string]interface{}{}
 	if req.Name != "" {
-		user.Name = req.Name
+		updates["name"] = req.Name
 	}
-	user.Phone = req.Phone
+	updates["phone"] = req.Phone
 
 	if req.Password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err == nil {
-			user.Password = string(hash)
+			updates["password"] = string(hash)
 		}
 	}
 
-	if err := database.DB.Save(&user).Error; err != nil {
+	if err := database.DB.Model(&user).Updates(updates).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile"})
 		return
 	}

@@ -17,6 +17,7 @@ type BarberResponse struct {
 	Name           string `json:"name"`
 	Provider       string `json:"provider"`
 	IsPresentToday bool   `json:"is_present_today"`
+	AvatarURL      string `json:"avatar_url"`
 }
 
 // GetAllBarbers mengambil semua user dengan role='barber' dari tabel users.
@@ -46,6 +47,7 @@ func GetAllBarbers() ([]BarberResponse, error) {
 			Name:           u.Name,
 			Provider:       u.Provider,
 			IsPresentToday: presentMap[u.ID],
+			AvatarURL:      u.AvatarURL,
 		})
 	}
 	return responses, nil

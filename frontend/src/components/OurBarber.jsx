@@ -42,10 +42,10 @@ const OurBarber = () => {
               className="w-full max-w-[260px] rounded-2xl overflow-hidden bg-[#1C1C1E] border border-neutral-800/50 transition-all duration-300 hover:-translate-y-1.5 shadow-xl"
             >
               {/* FOTO */}
-              <div className="h-[280px] bg-neutral-800 overflow-hidden">
+              <div className="h-[280px] bg-neutral-800 overflow-hidden flex items-center justify-center">
                 <img
-                  src={barber.foto}
-                  alt={barber.nama}
+                  src={barber.avatar_url || `https://ui-avatars.com/api/?name=${barber.name || 'Barber'}&background=FFB22C&color=000&size=256`}
+                  alt={barber.name || "Barber"}
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
@@ -53,10 +53,10 @@ const OurBarber = () => {
               {/* INFO */}
               <div className="px-5 py-4 text-left">
                 <h3 className="text-white text-lg font-bold">
-                  {barber.nama}
+                  {barber.name}
                 </h3>
                 <p className="text-[#FFCC00] text-sm mt-1">
-                  {barber.deskripsi}
+                  {barber.is_present_today ? "Hadir Hari Ini" : "Tidak Hadir"}
                 </p>
               </div>
             </div>

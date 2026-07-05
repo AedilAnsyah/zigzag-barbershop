@@ -66,6 +66,7 @@ func SetupRouter() *gin.Engine {
 			// Profile endpoints
 			protected.GET("/profile", user.GetProfileHandler)
 			protected.PUT("/profile", user.UpdateProfileHandler)
+			protected.POST("/profile/photo", user.UploadPhotoHandler)
 		}
 
 		// Admin-only routes — butuh JWT + role admin

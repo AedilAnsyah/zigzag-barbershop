@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
@@ -8,6 +8,8 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, setUser, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const getInitialName = () => {
     const localUserStr = localStorage.getItem('user');
@@ -140,6 +142,49 @@ export default function Profile() {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      toast.error("Format foto harus JPG, JPEG, atau PNG.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 2MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    const form = new FormData();
+    form.append("photo", file);
+
+    try {
+      const res = await api.post("/profile/photo", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (setUser && user) {
+        // Update user safely
+        setUser((prevUser) => {
+          if (!prevUser) return prevUser;
+          const updated = { ...prevUser, avatar_url: res.data.avatar_url };
+          localStorage.setItem('user', JSON.stringify(updated));
+          return updated;
+        });
+      }
+      toast.success("Foto profil berhasil diunggah!");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Gagal mengunggah foto.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -191,17 +236,41 @@ export default function Profile() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pb-8 border-b border-neutral-800">
             <div className="flex items-center gap-5">
               {/* AVATAR */}
-              <div className="w-24 h-24 rounded-full border border-neutral-700 bg-[#2C2C2E] shadow-lg flex items-center justify-center overflow-hidden select-none">
+              <div className="w-24 h-24 rounded-full border border-neutral-700 bg-[#2C2C2E] shadow-lg flex items-center justify-center overflow-hidden select-none relative group">
+                {isUploading && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#FFB22C] border-t-transparent" />
+                  </div>
+                )}
                 <img
                   src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=FFB22C&color=000&size=128`}
                   alt="Profile"
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${isUploading ? 'opacity-50' : 'opacity-100'} transition-opacity`}
                 />
               </div>
-              <div>
+              <div className="flex flex-col gap-2">
                 <h2 className="text-xl md:text-2xl font-bold tracking-tight">
                   {profileData.name}
                 </h2>
+                {isEditing && (
+                  <div>
+                    <input 
+                      type="file" 
+                      accept=".jpg,.jpeg,.png" 
+                      className="hidden" 
+                      ref={fileInputRef} 
+                      onChange={handlePhotoUpload} 
+                    />
+                    <button
+                      type="button"
+                      disabled={isUploading}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg font-medium transition cursor-pointer border border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUploading ? 'Mengunggah...' : 'Ganti Foto'}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

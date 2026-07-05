@@ -68,7 +68,7 @@ export default function Profile() {
              // We must safely update user without causing an infinite loop
              setUser((prevUser) => {
                if (!prevUser) return prevUser;
-               const updated = { ...prevUser, name: res.data.name, phone: res.data.phone };
+               const updated = { ...prevUser, name: res.data.name, phone: res.data.phone, avatar_url: res.data.avatar_url || prevUser.avatar_url };
                localStorage.setItem('user', JSON.stringify(updated));
                return updated;
              });

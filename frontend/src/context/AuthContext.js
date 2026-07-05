@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
             email: decoded.email,
             role: decoded.role,
             name: localUser?.name || decoded.name || decoded.email.split('@')[0],
-            avatar_url: decoded.avatar_url,
+            avatar_url: localUser?.avatar_url || decoded.avatar_url,
           });
         }
       } catch (error) {

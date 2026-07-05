@@ -28,9 +28,10 @@ func GetProfileHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"name":  user.Name,
-		"email": user.Email,
-		"phone": user.Phone,
+		"name":       user.Name,
+		"email":      user.Email,
+		"phone":      user.Phone,
+		"avatar_url": user.AvatarURL,
 	})
 }
 

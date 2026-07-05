@@ -49,15 +49,31 @@ export const AuthProvider = ({ children }) => {
       // Save token
       localStorage.setItem("token", token);
 
-      // Decode and set user
+      // Decode token
       const decoded = jwtDecode(token);
-      setUser({
+      let userData = {
         id: decoded.user_id,
         email: decoded.email,
         role: decoded.role,
         name: decoded.name || decoded.email.split('@')[0],
         avatar_url: decoded.avatar_url,
-      });
+      };
+
+      try {
+        // Fetch fresh profile data (name, phone, avatar) right after login
+        const profileRes = await api.get("/profile");
+        userData = {
+          ...userData,
+          name: profileRes.data.name || userData.name,
+          avatar_url: profileRes.data.avatar_url || userData.avatar_url,
+        };
+      } catch (err) {
+        console.error("Failed to fetch profile during login", err);
+      }
+
+      // Save updated user to localStorage and state
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
 
       return { success: true, role: decoded.role };
     } catch (error) {
@@ -80,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
       // Decode JWT token untuk mendapatkan data user
       const decoded = jwtDecode(token);
-      const userData = {
+      let userData = {
         id: decoded.user_id,
         email: decoded.email,
         role: decoded.role,
@@ -88,6 +104,19 @@ export const AuthProvider = ({ children }) => {
         avatar_url: decoded.avatar_url,
       };
 
+      try {
+        // Fetch fresh profile data right after Google login
+        const profileRes = await api.get("/profile");
+        userData = {
+          ...userData,
+          name: profileRes.data.name || userData.name,
+          avatar_url: profileRes.data.avatar_url || userData.avatar_url,
+        };
+      } catch (err) {
+        console.error("Failed to fetch profile during Google login", err);
+      }
+
+      localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
       return { success: true, role: decoded.role };
